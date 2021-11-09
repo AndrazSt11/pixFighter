@@ -13,7 +13,9 @@ class Player:
 
 		# player data
 		self.x = x
-		self.y = y
+		self.y = y 
+		self.moveX = 0
+		self.moveY = 0
 		self.name = name
 		self.hp = hp
 		self.alive = True
@@ -22,7 +24,8 @@ class Player:
 		self.animation = {} # dictionary containing images of actions - idle, attack, walk, etc. 
 		self.index = 0
 		self.update_time = pygame.time.get_ticks()
-		self.animation_cooldown = 200
+		self.animation_cooldown = 200 
+		self.frame = 0
 
 		# idle images
 		current_list = []
@@ -36,11 +39,11 @@ class Player:
 		# walking images
 		current_list = []
 		for i in range(5): 
-			img = pygame.image.load(f"./textures/Player/Player1/adventurer-walk-0{i}.png")
+			img = pygame.image.load(f"./textures/Player/Player1/adventurer-run-0{i}.png")
 			img = pygame.transform.scale(img, (150, 100))
 			current_list.append(img)
 		
-		self.animation["walk"] = current_list # add action to database of animations
+		self.animation["run"] = current_list # add action to database of animations
 
 		# by default use idle, because player is static
 		animation_data = self.animation["idle"]
@@ -49,20 +52,48 @@ class Player:
 		self.rect.center = (x, y) 
 
 
-	def update(self, action):
+	def update(self, action, flip):
 		"""
 		Handle animation
-		:param action: gives name of action that player is preforming (idle by default)
-		"""
-		# update image
-		self.image = self.animation[action][self.index]
+		:param action: gives name of action that player is preforming (idle by default) 
+		:param flip: bool parameter to flip image when moving to left side
+		""" 
+		if flip:
+			# update image
+			self.image = pygame.transform.flip(self.animation[action][self.index], True, False)
+		else: 
+			self.image = self.animation[action][self.index]
 
 		# check for the time between updates
 		if pygame.time.get_ticks() - self.update_time > self.animation_cooldown: 
 			self.update_time = pygame.time.get_ticks()
 			self.index += 1
 
+
 		# check if index is higher than number of images in the animation
 		if self.index >= len(self.animation[action]):
-			self.index = 0
+			self.index = 0 
+
+	
+	def control_position(self, x, y): 
+		"""
+		Contol movement of a player
+		:param x: new x coordinate
+		:param y: new y coordinate
+		"""
+		self.moveX += x
+		self.moveY += y 
+
+	
+	def update_movement(self): 
+		"""
+		Update position of a player 
+		""" 
+
+		self.x += self.moveX 
+		self.y += self.moveY 
+		
+
+
+
 		

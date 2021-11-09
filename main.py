@@ -15,8 +15,6 @@ FPS = 60
 assets = {}
 data = {} 
 
-# type of animation 
-animation_action = "idle"
 
 WIN = pygame.display.set_mode((WIDTH, HEIGTH))
 pygame.display.set_caption("pixFighter")
@@ -74,8 +72,8 @@ def draw_background():
 	WIN.blit(assets["lvl1_floor"], data['floor_position'])
 
 
-def draw_player(action): 
-	player.update(action)
+def draw_player(action, flip): 
+	player.update(action, flip)
 	WIN.blit(player.image, [player.x, player.y])
 
 
@@ -87,6 +85,12 @@ def draw_bandit():
 
 
 def main(): 
+
+	# type of animation 
+	animation_action = "idle" 
+
+	flip = False
+
 	run = True
 
 	init()
@@ -97,28 +101,46 @@ def main():
 		# insures that program runs 60FPS
 		clock.tick(FPS)
 
+		# inside this for loop we check for different events that occur in pygame
+		for event in pygame.event.get(): 
+
+			if event.type == pygame.QUIT: 
+				run = False  
+
+			if event.type == pygame.KEYDOWN:
+            
+				if event.key == pygame.K_LEFT or event.key == ord('a'):
+					player.control_position(-5, 0)
+					animation_action = "run"
+					flip = True
+				if event.key == pygame.K_RIGHT or event.key == ord('d'):
+					player.control_position(5, 0)
+					animation_action = "run" 
+					flip = False
+
+
+			if event.type == pygame.KEYUP:
+				if event.key == pygame.K_LEFT or event.key == ord('a'):
+					player.control_position(5, 0) 
+					player.index = 0
+					animation_action = "idle" 
+				if event.key == pygame.K_RIGHT or event.key == ord('d'):
+					player.control_position(-5, 0)
+					player.index = 0
+					animation_action = "idle"
+
 		# draws backgroun
 		draw_background()
 
 		# draws player
-		draw_player(animation_action)
+		player.update_movement()
+		draw_player(animation_action, flip)
 
 		# draws bandit
 		draw_bandit()
 
 		# updates display
 		pygame.display.update()
-
-		# inside this for loop we check for different events that occur in pygame
-		for event in pygame.event.get(): 
-
-			if event.type == pygame.QUIT: 
-				run = False 
-
-			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_RIGHT:
-					player.x += 8
-					#animation_action = "walk"
 
 	pygame.quit() 
 
