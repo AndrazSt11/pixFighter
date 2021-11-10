@@ -24,7 +24,6 @@ class Player:
 		self.animation = {} # dictionary containing images of actions - idle, attack, walk, etc. 
 		self.index = 0
 		self.update_time = pygame.time.get_ticks()
-		self.animation_cooldown = 200 
 		self.frame = 0
 
 		# idle images
@@ -45,6 +44,15 @@ class Player:
 		
 		self.animation["run"] = current_list # add action to database of animations
 
+		# walking images
+		current_list = []
+		for i in range(5): 
+			img = pygame.image.load(f"./textures/Player/Player1/adventurer-attack2-0{i}.png")
+			img = pygame.transform.scale(img, (150, 100))
+			current_list.append(img)
+		
+		self.animation["attack"] = current_list # add action to database of animations
+
 		# by default use idle, because player is static
 		animation_data = self.animation["idle"]
 		self.image = animation_data[self.index]
@@ -52,7 +60,7 @@ class Player:
 		self.rect.center = (x, y) 
 
 
-	def update(self, action, flip):
+	def update(self, action, flip, cooldown):
 		"""
 		Handle animation
 		:param action: gives name of action that player is preforming (idle by default) 
@@ -65,7 +73,7 @@ class Player:
 			self.image = self.animation[action][self.index]
 
 		# check for the time between updates
-		if pygame.time.get_ticks() - self.update_time > self.animation_cooldown: 
+		if pygame.time.get_ticks() - self.update_time > cooldown: 
 			self.update_time = pygame.time.get_ticks()
 			self.index += 1
 
