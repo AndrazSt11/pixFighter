@@ -113,7 +113,7 @@ def main():
 
 	# call load functions
 	init()
-	load()
+	load() 
 
 	while run: 
 
@@ -146,6 +146,7 @@ def main():
 					#player.control_position(5, 0)
 					animation_action = "attack" 
 					animation_cooldown = 90
+					player.hit_sound()
 
 
 			if event.type == pygame.KEYUP:

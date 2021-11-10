@@ -100,7 +100,16 @@ class Player:
 
 		self.x += self.moveX 
 		self.y += self.moveY 
-		
+
+	def hit_sound(self): 
+		"""
+		Play hit sound
+		"""
+		# sounds
+		pygame.mixer.pre_init(44100, -16, 2, 2048)
+		pygame.init()
+		pygame.mixer.music.load(f"./sounds/player/player_attack.wav")
+		pygame.mixer.music.play()
 
 
 
