@@ -18,7 +18,12 @@ class Player:
 		self.moveY = 0
 		self.name = name
 		self.hp = hp
-		self.alive = True
+		self.alive = True 
+
+		# player jumping
+		self.is_jumping = False
+		self.velocity = 9
+		self.mass = 1
 
 		# animation 
 		self.animation = {} # dictionary containing images of actions - idle, attack, walk, etc. 
@@ -51,7 +56,16 @@ class Player:
 			img = pygame.transform.scale(img, (150, 100))
 			current_list.append(img)
 		
-		self.animation["attack"] = current_list # add action to database of animations
+		self.animation["attack"] = current_list # add action to database of animations 
+
+		# jumping images
+		current_list = []
+		for i in range(3): 
+			img = pygame.image.load(f"./textures/Player/Player1/adventurer-jump-0{i}.png")
+			img = pygame.transform.scale(img, (150, 100))
+			current_list.append(img)
+		
+		self.animation["jump"] = current_list # add action to database of animations
 
 		# by default use idle, because player is static
 		animation_data = self.animation["idle"]
@@ -100,6 +114,32 @@ class Player:
 
 		self.x += self.moveX 
 		self.y += self.moveY 
+
+
+	def jumping(self): 
+		"""
+		Calculating jump
+		"""
+
+		# calculate force
+		force =(1 / 2)*self.mass*(self.velocity**2) 
+
+		# change y coordinate
+		self.y -= force
+		self.velocity = self.velocity - 1
+
+		# if object has reached maximum height
+		if self.velocity < 0:
+			self.mass =-1
+
+		# if object reaches its original state
+		if self.velocity ==-10:
+			
+			# set the jumping boolean to False
+			self.is_jumping = False
+			self.velocity = 9
+			self.mass = 1
+
 
 	def hit_sound(self): 
 		"""

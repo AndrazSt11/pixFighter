@@ -142,6 +142,14 @@ def main():
 					animation_cooldown = 200
 					flip = False 
 
+				# jump
+				if event.key == pygame.K_UP or event.key == ord('w'): 
+
+					player.is_jumping = True
+					animation_action = "jump" 
+					animation_cooldown = 250
+
+				# attack
 				if event.key == ord('k'):
 					#player.control_position(5, 0)
 					animation_action = "attack" 
@@ -161,10 +169,18 @@ def main():
 					player.index = 0
 					animation_action = "idle"
 
+				if event.key == pygame.K_UP or event.key == ord('w'):
+					player.index = 0
+					animation_action = "idle"
+
 				if event.key == ord('k'):
 					player.index = 0
 					animation_action = "idle"
-					animation_cooldown = 200
+					animation_cooldown = 200 
+
+		# check if player is_jumping boolean is True
+		if player.is_jumping:
+			player.jumping()
 
 		# draws backgroun
 		draw_background()
