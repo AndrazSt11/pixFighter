@@ -2,6 +2,7 @@ import pygame
 import os
 from Player import Player
 from Bandit import Bandit
+from Physics import Physics
 
 
 clock = pygame.time.Clock()
@@ -24,7 +25,7 @@ pygame.display.set_caption("pixFighter")
 player = Player(0, 380, "Player", 100)
 
 # declare bandit 
-bandits = [Bandit(700, 380, "Bandit1", 100), Bandit(600, 380, "Bandit2", 100)]
+bandits = [Bandit(700, 380, "Bandit1", 100), Bandit(600, 380, "Bandit2", 100)] 
 
 
 def init():
@@ -85,13 +86,25 @@ def draw_player(action, flip, animation_cooldown):
 	WIN.blit(player.image, [player.x, player.y])
 
 
-def draw_bandit(): 
+def draw_bandit(player): 
 	"""
 	It draws bandits on screen
+	:param player: a player that is in the game
 	"""
 	for bandit in bandits:
-		bandit.update()
+		bandit.update(player)
 		WIN.blit(bandit.image, [bandit.x, bandit.y]) 
+
+
+def draw_player_health(): 
+	"""
+	Function, that draws health of a player on the screen
+	""" 
+	font = pygame.font.Font('freesansbold.ttf', 20)
+	text = font.render(f'Health: {player.hp}', True, [255, 255, 255],None)
+	textRect = text.get_rect() 
+	textRect.center = (100, 50) 
+	WIN.blit(text, textRect)
 
 
 def main(): 
@@ -114,6 +127,7 @@ def main():
 	# call load functions
 	init()
 	load() 
+	pygame.init()
 
 	while run: 
 
@@ -132,26 +146,24 @@ def main():
 				if event.key == pygame.K_LEFT or event.key == ord('a'):
 					player.control_position(-5, 0)
 					animation_action = "run"
-					animation_cooldown = 200
+					animation_cooldown = 150
 					flip = True
 
 				# move right
 				if event.key == pygame.K_RIGHT or event.key == ord('d'):
 					player.control_position(5, 0)
 					animation_action = "run" 
-					animation_cooldown = 200
+					animation_cooldown = 150
 					flip = False 
 
 				# jump
 				if event.key == pygame.K_UP or event.key == ord('w'): 
-
 					player.is_jumping = True
 					animation_action = "jump" 
 					animation_cooldown = 250
 
 				# attack
 				if event.key == ord('k'):
-					#player.control_position(5, 0)
 					animation_action = "attack" 
 					animation_cooldown = 90
 					player.hit_sound()
@@ -160,7 +172,7 @@ def main():
 			if event.type == pygame.KEYUP:
 
 				if event.key == pygame.K_LEFT or event.key == ord('a'):
-					player.control_position(5, 0) 
+					player.control_position(5, 0)
 					player.index = 0 
 					animation_action = "idle"
 
@@ -182,15 +194,23 @@ def main():
 		if player.is_jumping:
 			player.jumping()
 
-		# draws backgroun
+		# draws background
 		draw_background()
 
 		# draws player
 		player.update_movement()
-		draw_player(animation_action, flip, animation_cooldown)
+		draw_player(animation_action, flip, animation_cooldown) 
+
+		for bandit in bandits: 
+			# move bandits until they reach the player
+			if not (bandit.x <= (player.x + 30) and bandit.x >= player.x - 30):
+				bandit.move_towards_player(player)
+
+		# draw health of a player 
+		draw_player_health()
 
 		# draws bandit
-		draw_bandit()
+		draw_bandit(player) 
 
 		# updates display
 		pygame.display.update()

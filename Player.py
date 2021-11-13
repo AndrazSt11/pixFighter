@@ -1,5 +1,9 @@
 import pygame
+from Physics import Physics
 
+
+# declare physics
+physics = Physics()
 
 class Player: 
 	def __init__(self, x, y, name, hp): 
@@ -95,25 +99,22 @@ class Player:
 		# check if index is higher than number of images in the animation
 		if self.index >= len(self.animation[action]):
 			self.index = 0 
+		
 
-	
-	def control_position(self, x, y): 
+	def control_position(self, x, y):
 		"""
-		Contol movement of a player
-		:param x: new x coordinate
-		:param y: new y coordinate
+		Calculate for how much player is going to move
+		:param x: movement on x axis
+		:param y: movement on y axis
 		"""
-		self.moveX += x
-		self.moveY += y 
+		self.moveX, self.moveY = physics.control_position(x, y, self.moveX, self.moveY)
 
-	
+
 	def update_movement(self): 
 		"""
-		Update position of a player 
-		""" 
-
-		self.x += self.moveX 
-		self.y += self.moveY 
+		Move player for calculated distance
+		"""
+		self.x, self.y = physics.update_movement(self.x, self.y, self.moveX, self.moveY)
 
 
 	def jumping(self): 
@@ -122,7 +123,7 @@ class Player:
 		"""
 
 		# calculate force
-		force =(1 / 2)*self.mass*(self.velocity**2) 
+		force = (1 / 2)*self.mass*(self.velocity**2) 
 
 		# change y coordinate
 		self.y -= force
@@ -135,10 +136,10 @@ class Player:
 		# if object reaches its original state
 		if self.velocity ==-10:
 			
-			# set the jumping boolean to False
+			# set the jumping boolean to False 
 			self.is_jumping = False
 			self.velocity = 9
-			self.mass = 1
+			self.mass = 1 
 
 
 	def hit_sound(self): 
@@ -148,7 +149,7 @@ class Player:
 		# sounds
 		pygame.mixer.pre_init(44100, -16, 2, 2048)
 		pygame.init()
-		pygame.mixer.music.load(f"./sounds/player/player_attack.wav")
+		pygame.mixer.music.load("./sounds/player/player_attack.wav")
 		pygame.mixer.music.play()
 
 
