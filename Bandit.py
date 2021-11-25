@@ -1,6 +1,7 @@
 import pygame 
 import math
 import random
+import time
 
 
 class Bandit: 
@@ -32,7 +33,10 @@ class Bandit:
 		self.index = 0
 		self.update_time = pygame.time.get_ticks() 
 		self.animation_cooldown = 100 
-		self.action = "idle"
+		self.action = "idle" 
+
+		# attack
+		self.update_time_attack = pygame.time.get_ticks() 
 
 		# idle images
 		current_list = []
@@ -51,6 +55,15 @@ class Bandit:
 			current_list.append(img)
 		
 		self.animation["run"] = current_list # add action to database of animations
+
+		# run images
+		current_list = []
+		for i in range(7): 
+			img = pygame.image.load(f"./textures/Sprites/Heavy/Attack/HeavyBandit_Attack_{i}.png")
+			img = pygame.transform.scale(img, (150, 100))
+			current_list.append(img)
+		
+		self.animation["attack"] = current_list # add action to database of animations
 
 		animation_data = self.animation["run"]
 		self.image = animation_data[self.index]
@@ -79,8 +92,9 @@ class Bandit:
 		# check if bandit has reached the player or near player location, to put 
 		# animation to idle else to run
 		if self.x <= (player.x + 30) and self.x >= player.x - 30:
-			self.action="idle" 
-			self.animation_cooldown = 200
+			self.action="attack" 
+			self.animation_cooldown = 100 
+			self.attack_player(player)
 		else: 
 			self.action = "run" 
 			self.animation_cooldown = 100
@@ -106,5 +120,21 @@ class Bandit:
 			dx, dy = dx / dist, dy / dist
 
 		# move towards player at current speed
-		self.x += dx * self.velocity
+		self.x += dx * self.velocity 
+
+	def attack_player(self, player): 
+		"""
+		Attack player
+		:param player: a player that bandits are attacking 
+		"""
 		
+		# direction vector between player and bandit
+		dx, dy = player.x - self.x, player.y - self.y
+		dist = math.hypot(dx, dy) 
+
+		# check if bandit and player are 0 distance away
+		if dist != 0 and pygame.time.get_ticks() - self.update_time_attack > 250: 
+			player.hp -= 0.3
+			self.update_time_attack = pygame.time.get_ticks()
+
+		return player

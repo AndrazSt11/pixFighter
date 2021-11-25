@@ -95,13 +95,12 @@ def draw_bandit(player):
 		bandit.update(player)
 		WIN.blit(bandit.image, [bandit.x, bandit.y]) 
 
-
 def draw_player_health(): 
 	"""
 	Function, that draws health of a player on the screen
 	""" 
 	font = pygame.font.Font('freesansbold.ttf', 20)
-	text = font.render(f'Health: {player.hp}', True, [255, 255, 255],None)
+	text = font.render(f'Health: {round(player.hp, 0)}', True, [255, 255, 255],None)
 	textRect = text.get_rect() 
 	textRect.center = (100, 50) 
 	WIN.blit(text, textRect)
