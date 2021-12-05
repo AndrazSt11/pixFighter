@@ -164,7 +164,8 @@ def main():
 				# attack
 				if event.key == ord('k'):
 					animation_action = "attack" 
-					animation_cooldown = 90
+					animation_cooldown = 90 
+					player.attack(bandits)
 					player.hit_sound()
 
 
@@ -203,7 +204,11 @@ def main():
 		for bandit in bandits: 
 			# move bandits until they reach the player
 			if not (bandit.x <= (player.x + 30) and bandit.x >= player.x - 30):
-				bandit.move_towards_player(player)
+				bandit.move_towards_player(player) 
+
+			if bandit.hp <= 0: 
+				player.body_hit_sound()
+				bandits.remove(bandit)
 
 		# draw health of a player 
 		draw_player_health()

@@ -1,7 +1,6 @@
 import pygame 
 import math
 import random
-import time
 
 
 class Bandit: 
@@ -34,6 +33,7 @@ class Bandit:
 		self.update_time = pygame.time.get_ticks() 
 		self.animation_cooldown = 100 
 		self.action = "idle" 
+		self.hurt_time = 0
 
 		# attack
 		self.update_time_attack = pygame.time.get_ticks() 
@@ -56,14 +56,23 @@ class Bandit:
 		
 		self.animation["run"] = current_list # add action to database of animations
 
-		# run images
+		# attack images
 		current_list = []
 		for i in range(7): 
 			img = pygame.image.load(f"./textures/Sprites/Heavy/Attack/HeavyBandit_Attack_{i}.png")
 			img = pygame.transform.scale(img, (150, 100))
 			current_list.append(img)
 		
-		self.animation["attack"] = current_list # add action to database of animations
+		self.animation["attack"] = current_list # add action to database of animations 
+
+		# hurt images
+		current_list = []
+		for i in range(1): 
+			img = pygame.image.load(f"./textures/Sprites/Heavy/Hurt/HeavyBandit_Hurt_{i}.png")
+			img = pygame.transform.scale(img, (150, 100))
+			current_list.append(img)
+		
+		self.animation["hurt"] = current_list # add action to database of animations 
 
 		animation_data = self.animation["run"]
 		self.image = animation_data[self.index]
@@ -90,14 +99,19 @@ class Bandit:
 			self.index += 1
 
 		# check if bandit has reached the player or near player location, to put 
-		# animation to idle else to run
-		if self.x <= (player.x + 30) and self.x >= player.x - 30:
-			self.action="attack" 
-			self.animation_cooldown = 100 
-			self.attack_player(player)
-		else: 
-			self.action = "run" 
-			self.animation_cooldown = 100
+		# animation to idle else to run 
+		if self.hurt_time == 5:
+			if self.x <= (player.x + 30) and self.x >= player.x - 30:
+				self.action="attack" 
+				self.animation_cooldown = 100 
+				self.attack_player(player)
+			else: 
+				self.action = "run" 
+				self.animation_cooldown = 100 
+
+			self.hurt_time = 0
+		else:
+			self.hurt_time += 1
 
 		# check if index is higher than number of images in the animation
 		if self.index >= len(self.animation[self.action]):

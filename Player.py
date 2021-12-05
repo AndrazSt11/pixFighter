@@ -1,5 +1,6 @@
 import pygame
 from Physics import Physics
+import math
 
 
 # declare physics
@@ -149,9 +150,37 @@ class Player:
 		# sounds
 		pygame.mixer.pre_init(44100, -16, 2, 2048)
 		pygame.init()
-		pygame.mixer.music.load("./sounds/player/player_attack.wav")
+		pygame.mixer.music.load("./sounds/player/whoosh-6316.mp3")
+		pygame.mixer.music.play() 
+
+	def body_hit_sound(self): 
+		"""
+		Play body hit sound
+		"""
+		# sounds
+		pygame.mixer.pre_init(44100, -16, 2, 2048)
+		pygame.init()
+		pygame.mixer.music.load("./sounds/player/hit.wav")
 		pygame.mixer.music.play()
 
+	def attack(self, bandits): 
+		"""
+		Function for attacking enemies 
+		:param flip: boolean variable if player is fliped
+		:param player: player that is in the game
+		:param bandits: bandits that are in the game
+		"""
+		
+		for bandit in bandits:
+			# direction vector between player and bandit
+			dx, dy = self.x - bandit.x, self.y - bandit.y
+			dist = math.hypot(dx, dy) 
 
+			# check if bandit and player are 0 distance away
+			if dist >= 0 and dist <= 30: 
+				bandit.hp -= 20
+				bandit.action = "hurt"
+				bandit.index = 0
+				bandit.animation_cooldown = 300
 
 		
