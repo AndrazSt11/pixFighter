@@ -2,7 +2,8 @@ import pygame
 import os
 from Player import Player
 from Bandit import Bandit
-from Physics import Physics
+from Physics import Physics 
+from Sounds import Sounds
 
 
 clock = pygame.time.Clock()
@@ -26,6 +27,9 @@ player = Player(0, 380, "Player", 100)
 
 # declare bandit 
 bandits = [Bandit(700, 380, "Bandit1", 100), Bandit(600, 380, "Bandit2", 100)] 
+
+# declare sounds object
+sounds = Sounds()
 
 
 def init():
@@ -143,6 +147,7 @@ def main():
 				
 				# move left 
 				if event.key == pygame.K_LEFT or event.key == ord('a'):
+					player.index = 0
 					player.control_position(-5, 0)
 					animation_action = "run"
 					animation_cooldown = 150
@@ -150,6 +155,7 @@ def main():
 
 				# move right
 				if event.key == pygame.K_RIGHT or event.key == ord('d'):
+					player.index = 0
 					player.control_position(5, 0)
 					animation_action = "run" 
 					animation_cooldown = 150
@@ -157,6 +163,7 @@ def main():
 
 				# jump
 				if event.key == pygame.K_UP or event.key == ord('w'): 
+					player.index = 0
 					player.is_jumping = True
 					animation_action = "jump" 
 					animation_cooldown = 250
@@ -166,7 +173,7 @@ def main():
 					animation_action = "attack" 
 					animation_cooldown = 90 
 					player.attack(bandits)
-					player.hit_sound()
+					sounds.hit_sound()
 
 
 			if event.type == pygame.KEYUP:
@@ -207,7 +214,7 @@ def main():
 				bandit.move_towards_player(player) 
 
 			if bandit.hp <= 0: 
-				player.body_hit_sound()
+				sounds.body_hit_sound()
 				bandits.remove(bandit)
 
 		# draw health of a player 
