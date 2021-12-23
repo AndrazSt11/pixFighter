@@ -24,6 +24,7 @@ class Player:
 		self.name = name
 		self.hp = hp
 		self.alive = True 
+		self.points = 0
 
 		# player jumping
 		self.is_jumping = False

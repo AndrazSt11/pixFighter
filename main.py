@@ -99,15 +99,21 @@ def draw_bandit(player):
 		bandit.update(player)
 		WIN.blit(bandit.image, [bandit.x, bandit.y]) 
 
-def draw_player_health(): 
+def draw_player_data(): 
 	"""
 	Function, that draws health of a player on the screen
 	""" 
 	font = pygame.font.Font('freesansbold.ttf', 20)
-	text = font.render(f'Health: {round(player.hp, 0)}', True, [255, 255, 255],None)
-	textRect = text.get_rect() 
+	health = font.render(f'Health: {round(player.hp, 0)}', True, [255, 255, 255],None) 
+	points = font.render(f'Points: {round(player.points, 0)}', True, [255, 255, 255],None)
+
+	textRect = health.get_rect() 
+	pointsRect = points.get_rect()
+
 	textRect.center = (100, 50) 
-	WIN.blit(text, textRect)
+	pointsRect.center = (100, 80)
+	WIN.blit(health, textRect)
+	WIN.blit(points, pointsRect)
 
 
 def main(): 
@@ -214,11 +220,12 @@ def main():
 				bandit.move_towards_player(player) 
 
 			if bandit.hp <= 0: 
+				player.points += 10
 				sounds.body_hit_sound()
 				bandits.remove(bandit)
 
-		# draw health of a player 
-		draw_player_health()
+		# draws data of a player 
+		draw_player_data()
 
 		# draws bandit
 		draw_bandit(player) 
