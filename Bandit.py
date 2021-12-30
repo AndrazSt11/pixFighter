@@ -1,6 +1,7 @@
 import pygame 
 import math
 import random
+from Sounds import Sounds 
 
 
 class Bandit: 
@@ -35,6 +36,9 @@ class Bandit:
 
 		# attack
 		self.update_time_attack = pygame.time.get_ticks() 
+
+		# sounds
+		self.sounds = Sounds()
 
 		# idle images
 		current_list = []
@@ -145,8 +149,9 @@ class Bandit:
 		dist = math.hypot(dx, dy) 
 
 		# check if bandit and player are 0 distance away
-		if dist != 0 and pygame.time.get_ticks() - self.update_time_attack > 250: 
+		if dist != 0 and pygame.time.get_ticks() - self.update_time_attack > 680: 
 			player.hp -= 1
 			self.update_time_attack = pygame.time.get_ticks()
+			self.sounds.hit_sound()
 
 		return player

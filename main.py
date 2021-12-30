@@ -114,7 +114,7 @@ class Game:
 		Method for creating bandits
 		"""
 		for i in range(num): 
-			self.bandits.append(Bandit(random.randint(400, 800), 380, 100)) 
+			self.bandits.append(Bandit(random.randint(100, 800), 380, 100)) 
 
 
 	# draw methods
@@ -372,6 +372,7 @@ class Game:
 		self.load() 
 		pygame.init() 
 
+		self.sounds.background_music()
 
 		while self.run: 
 			if self.state == State.TITLE: 

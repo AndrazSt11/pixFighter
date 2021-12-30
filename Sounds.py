@@ -11,8 +11,9 @@ class Sounds:
         # sounds
         pygame.mixer.pre_init(44100, -16, 2, 2048)
         pygame.init()
-        pygame.mixer.music.load("./sounds/player/whoosh-6316.mp3")
-        pygame.mixer.music.play() 
+        hit = pygame.mixer.Sound("./sounds/player/whoosh-6316.wav")
+        hit.play() 
+        hit.set_volume(0.3)
 
     def body_hit_sound(self): 
         """
@@ -21,5 +22,18 @@ class Sounds:
         # sounds
         pygame.mixer.pre_init(44100, -16, 2, 2048)
         pygame.init()
-        pygame.mixer.music.load("./sounds/player/hit.wav")
+        body_hit = pygame.mixer.Sound("./sounds/player/hit.wav")
+        body_hit.play() 
+        body_hit.set_volume(0.2)
+
+    
+    def background_music(self): 
+        """
+        Play music
+        """
+        # sounds
+        pygame.mixer.pre_init(44100, -16, 2, 2048)
+        pygame.init()
+        music = pygame.mixer.music.load("./sounds/music/Background_song.mp3")
         pygame.mixer.music.play()
+        pygame.mixer.music.set_volume(0.2)
