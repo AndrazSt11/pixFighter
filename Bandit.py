@@ -4,12 +4,11 @@ import random
 
 
 class Bandit: 
-	def __init__(self, x, y, name, hp): 
+	def __init__(self, x, y, hp): 
 		"""
 		A class of a bandit
 		:param x: starting x coordinate of a player
 		:param y: starting y coordinate of a player
-		:param name: name of a player
 		:param hp: health of a user
 		"""
 
@@ -18,7 +17,6 @@ class Bandit:
 		self.y = y
 		self.moveX = 0
 		self.moveY = 0
-		self.name = name
 		self.hp = hp
 		self.alive = True 
 
@@ -148,7 +146,7 @@ class Bandit:
 
 		# check if bandit and player are 0 distance away
 		if dist != 0 and pygame.time.get_ticks() - self.update_time_attack > 250: 
-			player.hp -= 0.3
+			player.hp -= 1
 			self.update_time_attack = pygame.time.get_ticks()
 
 		return player
