@@ -277,8 +277,9 @@ class Game:
 				# on enter press start the game
 				if event.key == pygame.K_RETURN: 
 					self.state = self.levels[0] 
-					print(self.state)
 					self.current_level += 1
+					self.player.hp = 100 
+					self.player.points = 0
 					self.isplaying = True
 
 

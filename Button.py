@@ -12,27 +12,39 @@ counter = 0
 
 class Button:
 		
-    #colours for button and text
-    button_col = (178, 39, 155)
-    hover_col = (75, 225, 255)
+    #colours for button
+    button_col = (179, 21, 153)
+    hover_col = (235, 129, 217)
     click_col = (50, 150, 255)
+    
+    # text color of button
     text_col = white
+
+    # dimensions of button
     width = 130
     height = 60
 
-    def __init__(self, x, y, text):
+    def __init__(self, x, y, text): 
+        """
+        BUtton class
+        :param x: x coordinate of button
+        :param y: y coordinate of button 
+        :param text: text of the button
+        """
         self.x = x
         self.y = y
         self.text = text
         self.clicked = False
 
     def draw_button(self, screen):
+        """
+        Method that draws button on the screen 
+        :param screen: screen of the game
+        """
         action = False
 
         #get mouse position
         pos = pygame.mouse.get_pos()
-
-        #create pygame Rect object for the button
         button_rect = Rect(self.x, self.y, self.width, self.height)
 
         #check mouseover and clicked conditions
@@ -47,12 +59,6 @@ class Button:
                 pygame.draw.rect(screen, self.hover_col, button_rect)
         else:
             pygame.draw.rect(screen, self.button_col, button_rect)
-
-        #add shading to button
-        pygame.draw.line(screen, white, (self.x, self.y), (self.x + self.width, self.y), 2)
-        pygame.draw.line(screen, white, (self.x, self.y), (self.x, self.y + self.height), 2)
-        pygame.draw.line(screen, black, (self.x, self.y + self.height), (self.x + self.width, self.y + self.height), 2)
-        pygame.draw.line(screen, black, (self.x + self.width, self.y), (self.x + self.width, self.y + self.height), 2)
 
         #add text to button
         font = pygame.font.Font('freesansbold.ttf', 20)
