@@ -5,7 +5,8 @@ from Player import Player
 from Bandit import Bandit
 from Physics import Physics 
 from Sounds import Sounds 
-from enum import Enum
+from enum import Enum 
+from Button import Button
 
 
 class State(Enum): 
@@ -72,6 +73,11 @@ class Game:
 		# boolean for playing game
 		self.isplaying = False 
 
+		# buttons
+		self.back = Button(730, 20, 'Back') 
+		self.restart = Button(730, 100, 'Restart') 
+
+
 
 	# load methods
 	def init(self):
@@ -127,7 +133,9 @@ class Game:
 		Game.WIN.blit(self.assets["lvl1_back"], [0, 0])
 		Game.WIN.blit(self.assets["lvl1_mountain"], self.data['ground_heigth'])
 		Game.WIN.blit(self.assets["lvl1_hill"], self.data['hill_position'])
-		Game.WIN.blit(self.assets["lvl1_floor"], self.data['floor_position'])
+		Game.WIN.blit(self.assets["lvl1_floor"], self.data['floor_position']) 
+		self.back.draw_button(Game.WIN) 
+		self.restart.draw_button(Game.WIN)
 
 
 	def draw_player(self, action, flip, animation_cooldown): 
@@ -267,8 +275,9 @@ class Game:
 			if event.type == pygame.KEYUP:
 				
 				# on enter press start the game
-				if event.key == pygame.K_RETURN:
-					self.state = self.levels[0]
+				if event.key == pygame.K_RETURN: 
+					self.state = self.levels[0] 
+					print(self.state)
 					self.current_level += 1
 					self.isplaying = True
 
@@ -291,8 +300,9 @@ class Game:
 
 		if len(self.bandits) == 0: 
 			self.isplaying = False 
-			self.state = self.levels[0]
-			self.levels = self.levels[1:]
+			self.state = self.levels[self.current_level]
+			self.current_level += 1
+			#self.levels = self.levels[self.current_level]
 
 
 	# main state loop methods
@@ -309,30 +319,45 @@ class Game:
 			# event manager function
 			self.get_events() 
 
-			if self.player.hp > 0:
+			if self.player.hp > 0: 
 
-				# check if player is_jumping boolean is True
-				if self.player.is_jumping:
-					self.player.jumping()
+				if self.back.clicked == False: 
+					
+					# reset all settings to 0
+					if self.restart.clicked == True:
+						self.player.hp = 100 
+						self.bandits = []
+						self.state = State.LVL1 
+						self.current_level = 0 
+						self.isplaying = False
+						self.player.points = 0
 
-				# draws background
-				self.draw_background()
+					# check if player is_jumping boolean is True
+					if self.player.is_jumping:
+						self.player.jumping()
 
-				# draws player
-				self.player.update_movement()
-				self.draw_player(self.animation_action, self.flip, self.animation_cooldown) 
+					# draws background
+					self.draw_background()
 
-				# bandit update
-				self.bandit_update()
+					# draws player
+					self.player.update_movement()
+					self.draw_player(self.animation_action, self.flip, self.animation_cooldown) 
 
-				# draws bandit
-				self.draw_bandit(self.player)  
+					# bandit update
+					self.bandit_update()
 
-				# draws data of a player 
-				self.draw_player_data()
+					# draws bandit
+					self.draw_bandit(self.player)  
 
-				# updates display
-				pygame.display.update() 
+					# draws data of a player 
+					self.draw_player_data()
+
+					# updates display
+					pygame.display.update() 
+				
+				else:
+					self.state = State.TITLE
+					self.isplaying = False
 			
 			else: 
 				self.isplaying = False
@@ -376,6 +401,8 @@ class Game:
 
 		while self.run: 
 			if self.state == State.TITLE: 
+				self.back.clicked = False 
+				self.bandits = []
 				self.main_title()
 			else:
 				if self.state == State.LVL1: 
