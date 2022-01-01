@@ -99,7 +99,7 @@ class Game:
 		Method that loads all the images needed for game
 		"""
 
-		# background lvl_1
+		# background lvl 1-3
 		self.assets["lvl1_back"] = pygame.image.load("./textures/Background/bg0.png").convert()
 		self.assets["lvl1_back"] = pygame.transform.scale(self.assets["lvl1_back"], (900, 500))
 
@@ -116,6 +116,32 @@ class Game:
 		self.assets["lvl1_floor"] = pygame.transform.scale(self.assets["lvl1_floor"], (900, 150)) 
 
 
+		# background lvl 4-7
+		self.assets["lvl2_back"] = pygame.image.load("./textures/Background2/sky.png").convert()
+		self.assets["lvl2_back"] = pygame.transform.scale(self.assets["lvl2_back"], (900, 500))
+
+
+		self.assets["lvl2_mountain"] = pygame.image.load("./textures/Background2/glacial_mountains.png")
+		self.assets["lvl2_mountain"] = pygame.transform.scale(self.assets["lvl2_mountain"], (900, 500))
+
+
+		self.assets["lvl2_hill"] = pygame.image.load("./textures/Background2/cloud_lonely.png")
+		self.assets["lvl2_hill"] = pygame.transform.scale(self.assets["lvl2_hill"], (900, 400))
+
+
+		self.assets["lvl2_floor"] = pygame.image.load("./textures/Background2/clouds_mg_3.png")
+		self.assets["lvl2_floor"] = pygame.transform.scale(self.assets["lvl2_floor"], (900, 150)) 
+
+
+		# background lvl 8-10
+		self.assets["lvl3_back"] = pygame.image.load("./textures/Background3/back.png").convert()
+		self.assets["lvl3_back"] = pygame.transform.scale(self.assets["lvl3_back"], (900, 500))
+
+
+		self.assets["lvl3_floor"] = pygame.image.load("./textures/Background3/floor.png")
+		self.assets["lvl3_floor"] = pygame.transform.scale(self.assets["lvl3_floor"], (900, 450)) 
+
+
 	def create_bandits(self, num):
 		"""
 		Method for creating bandits
@@ -130,11 +156,20 @@ class Game:
 		Method for drawing background to the window
 		"""
 
-		# background
-		Game.WIN.blit(self.assets["lvl1_back"], [0, 0])
-		Game.WIN.blit(self.assets["lvl1_mountain"], self.data['ground_heigth'])
-		Game.WIN.blit(self.assets["lvl1_hill"], self.data['hill_position'])
-		Game.WIN.blit(self.assets["lvl1_floor"], self.data['floor_position']) 
+		# background 
+		if self.current_level <= 3:
+			Game.WIN.blit(self.assets["lvl1_back"], [0, 0])
+			Game.WIN.blit(self.assets["lvl1_mountain"], self.data['ground_heigth'])
+			Game.WIN.blit(self.assets["lvl1_hill"], self.data['hill_position'])
+			Game.WIN.blit(self.assets["lvl1_floor"], self.data['floor_position']) 
+		elif self.current_level > 3 and self.current_level <= 7:
+			Game.WIN.blit(self.assets["lvl2_back"], [0, 0])
+			Game.WIN.blit(self.assets["lvl2_mountain"], self.data['ground_heigth'])
+			Game.WIN.blit(self.assets["lvl2_hill"], self.data['hill_position'])
+			Game.WIN.blit(self.assets["lvl2_floor"], self.data['floor_position']) 
+		else:
+			Game.WIN.blit(self.assets["lvl3_back"], [0, 0])
+			Game.WIN.blit(self.assets["lvl3_floor"], [0, 80])
 		self.back.draw_button(Game.WIN) 
 		self.restart.draw_button(Game.WIN)
 
