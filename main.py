@@ -37,6 +37,7 @@ class Game:
 	WHITE = (255, 255 ,255) 
 	FPS = 60
 
+	# game window
 	WIN = pygame.display.set_mode((WIDTH, HEIGTH))
 	pygame.display.set_caption("pixFighter")
 
@@ -402,6 +403,7 @@ class Game:
 
 		while self.run: 
 			if self.state == State.TITLE: 
+				self.current_level = 0
 				self.back.clicked = False 
 				self.bandits = []
 				self.main_title()
