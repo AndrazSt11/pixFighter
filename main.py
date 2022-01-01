@@ -75,8 +75,8 @@ class Game:
 		self.isplaying = False 
 
 		# buttons
-		self.back = Button(730, 20, 'Back') 
-		self.restart = Button(730, 100, 'Restart') 
+		self.back = Button(780, 20, 'Back') 
+		self.restart = Button(780, 60, 'Restart') 
 
 
 
