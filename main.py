@@ -74,13 +74,20 @@ class Game:
 		# boolean for playing game
 		self.isplaying = False 
 
+		# boolean game over 
+		self.game_over = False 
+
+		# boolean win
+		self.finish = False 
+
 		# buttons
 		self.back = Button(780, 20, 'Back') 
 		self.restart = Button(780, 60, 'Restart') 
+		self.end = Button(400, 400, 'End')
 
 
 
-	# load methods
+	# ------------------- load methods -------------------------------
 	def init(self):
 		"""
 		Method for loading default positions of elements 
@@ -142,6 +149,7 @@ class Game:
 		self.assets["lvl3_floor"] = pygame.transform.scale(self.assets["lvl3_floor"], (900, 450)) 
 
 
+	#-------------------- create bandit method ---------------------------
 	def create_bandits(self, num):
 		"""
 		Method for creating bandits
@@ -150,26 +158,30 @@ class Game:
 			self.bandits.append(Bandit(random.randint(100, 800), 380, 100)) 
 
 
-	# draw methods
+	#-------------------- draw methods ------------------------------------
 	def draw_background(self):
 		"""
 		Method for drawing background to the window
 		"""
 
-		# background 
-		if self.current_level <= 3:
+		# background for each level 
+		if self.current_level <= 3: 
 			Game.WIN.blit(self.assets["lvl1_back"], [0, 0])
 			Game.WIN.blit(self.assets["lvl1_mountain"], self.data['ground_heigth'])
 			Game.WIN.blit(self.assets["lvl1_hill"], self.data['hill_position'])
 			Game.WIN.blit(self.assets["lvl1_floor"], self.data['floor_position']) 
+
 		elif self.current_level > 3 and self.current_level <= 7:
 			Game.WIN.blit(self.assets["lvl2_back"], [0, 0])
 			Game.WIN.blit(self.assets["lvl2_mountain"], self.data['ground_heigth'])
 			Game.WIN.blit(self.assets["lvl2_hill"], self.data['hill_position'])
 			Game.WIN.blit(self.assets["lvl2_floor"], self.data['floor_position']) 
-		else:
+
+		else: 
 			Game.WIN.blit(self.assets["lvl3_back"], [0, 0])
-			Game.WIN.blit(self.assets["lvl3_floor"], [0, 80])
+			Game.WIN.blit(self.assets["lvl3_floor"], [0, 80]) 
+
+		# draw buttons
 		self.back.draw_button(Game.WIN) 
 		self.restart.draw_button(Game.WIN)
 
@@ -225,10 +237,78 @@ class Game:
 		text_surface = font.render(text, True, color) 
 		text_rect = text_surface.get_rect() 
 		text_rect.center = (x, y) 
-		surface.blit(text_surface, text_rect) 
+		surface.blit(text_surface, text_rect)  
+
+	
+	def draw_game_over(self): 
+		"""
+		Method for game over state
+		"""
+		while self.game_over:
+
+			if self.end.clicked == False:
+				# inside this for loop we check for different events that occur in pygame
+				for event in pygame.event.get(): 
+					
+					# if we click x the game quits
+					if event.type == pygame.QUIT: 
+						pygame.quit()
+
+				# color the background 
+				Game.WIN.fill((215, 157, 207))
+
+				# set text for main screen
+				self.draw_text(Game.WIN, "GAME OVER", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/3, 80) 
+				self.draw_text(Game.WIN, "Points: {}".format(self.player.points), [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/3) + 80, 30) 
+
+				# set the button on the screen
+				self.end.draw_button(Game.WIN) 
+
+				# updates display
+				pygame.display.update()
+			else: 
+				# back to TITLE state
+				self.game_over = False 
+				self.isplaying = False 
+				self.end.clicked = False
+				self.state = State.TITLE 
 
 
-	# event methods
+	def draw_win(self): 
+		"""
+		Method for win state
+		"""
+		while self.finish:
+
+			if self.end.clicked == False:
+				# inside this for loop we check for different events that occur in pygame
+				for event in pygame.event.get(): 
+					
+					# if we click x the game quits
+					if event.type == pygame.QUIT: 
+						pygame.quit()
+
+				# color the background 
+				Game.WIN.fill((43, 178, 70))
+
+				# set text for main screen
+				self.draw_text(Game.WIN, "WINNER!", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/3, 80) 
+				self.draw_text(Game.WIN, "Points: {}".format(self.player.points), [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/3) + 80, 30) 
+
+				# set the button on the screen
+				self.end.draw_button(Game.WIN) 
+
+				# updates display
+				pygame.display.update()
+			else: 
+				# back to TITLE state
+				self.finish = False 
+				self.isplaying = False 
+				self.end.clicked = False
+				self.state = State.TITLE
+
+
+	#----------------------- event methods ------------------------------
 	def get_events(self):
 		"""
 		Method for event managing
@@ -319,7 +399,7 @@ class Game:
 					self.isplaying = True
 
 
-	# update methods
+	#--------------------------- update methods ---------------------------------
 	def bandit_update(self): 
 		"""
 		Method for updating bandits
@@ -337,12 +417,20 @@ class Game:
 
 		if len(self.bandits) == 0: 
 			self.isplaying = False 
-			self.state = self.levels[self.current_level]
-			self.current_level += 1
-			#self.levels = self.levels[self.current_level]
+
+			# check if we killed all enemies in all levels
+			if self.state == State.LVL11:
+				self.finish = True
+				self.state = State.FINISH 
+			
+			else:
+				# update to new level
+				self.state = self.levels[self.current_level]
+				self.current_level += 1
+				#self.levels = self.levels[self.current_level]
 
 
-	# main state loop methods
+	#------------------------ main state loop methods ---------------------------
 	def main(self): 
 		"""
 		Main playing method
@@ -398,6 +486,7 @@ class Game:
 			
 			else: 
 				self.isplaying = False
+				self.game_over = True
 				self.state = State.GAME_OVER
 
 
@@ -424,7 +513,6 @@ class Game:
 			pygame.display.update()
 
 
-	# main execute method
 	def execute(self): 
 		"""
 		Main method for execution of the game
@@ -488,15 +576,9 @@ class Game:
 					self.create_bandits(11)
 					self.main() 
 				elif self.state == State.GAME_OVER: 
-					# color the background 
-					Game.WIN.fill((178, 39, 155))
-
-					# set text for main screen
-					self.draw_text(Game.WIN, "GAME OVER", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/3, 80)
-
-					# updates display
-					pygame.display.update()
-
+					self.draw_game_over() 
+				elif self.state == State.FINISH: 
+					self.draw_win()
 
 
 if __name__ == "__main__": 

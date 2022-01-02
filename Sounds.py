@@ -1,7 +1,10 @@
 import pygame
 
 class Sounds: 
-    def __init__(self):
+    def __init__(self): 
+        """
+        Class made for playing sounds
+        """
         pass
 
     def hit_sound(self): 

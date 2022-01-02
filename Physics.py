@@ -2,6 +2,9 @@ import pygame
 
 class Physics: 
     def __init__(self): 
+        """
+        Simple physics class
+        """
         physics = None 
 
 

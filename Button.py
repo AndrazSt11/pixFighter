@@ -36,6 +36,7 @@ class Button:
         self.text = text
         self.clicked = False
 
+
     def draw_button(self, screen):
         """
         Method that draws button on the screen 
@@ -64,5 +65,6 @@ class Button:
         font = pygame.font.Font('freesansbold.ttf', 15)
         text_img = font.render(self.text, True, self.text_col)
         text_len = text_img.get_width()
-        screen.blit(text_img, (self.x + int(self.width / 2) - int(text_len / 2), self.y + 8))
+        screen.blit(text_img, (self.x + int(self.width / 2) - int(text_len / 2), self.y + 8)) 
+        
         return action
