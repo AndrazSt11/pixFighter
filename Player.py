@@ -24,7 +24,11 @@ class Player:
 		self.name = name
 		self.hp = hp
 		self.alive = True 
-		self.points = 0
+		self.points = 0 
+
+		# player extra points for time 
+		self.extra_p = 300
+		self.start_time = None
 
 		# player jumping
 		self.is_jumping = False

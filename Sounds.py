@@ -27,6 +27,17 @@ class Sounds:
         pygame.init()
         body_hit = pygame.mixer.Sound("./sounds/player/hit.wav")
         body_hit.play() 
+        body_hit.set_volume(0.2) 
+
+    def jump_sound(self): 
+        """
+        Play jump sound
+        """
+        # sounds
+        pygame.mixer.pre_init(44100, -16, 2, 2048)
+        pygame.init()
+        body_hit = pygame.mixer.Sound("./sounds/player/Jump.mp3")
+        body_hit.play() 
         body_hit.set_volume(0.2)
 
     

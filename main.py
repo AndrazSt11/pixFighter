@@ -1,5 +1,5 @@
+import time
 import pygame
-import os
 import random
 from Player import Player
 from Bandit import Bandit
@@ -7,6 +7,7 @@ from Physics import Physics
 from Sounds import Sounds 
 from enum import Enum 
 from Button import Button
+from os import path
 
 
 class State(Enum): 
@@ -35,7 +36,10 @@ class Game:
 	# constants for creating main surface (new window of this width and heigth)
 	WIDTH, HEIGTH = 900, 500
 	WHITE = (255, 255 ,255) 
-	FPS = 60
+	FPS = 60 
+
+	# high score file 
+	HS_FILE = "highscore.txt"
 
 	# game window
 	WIN = pygame.display.set_mode((WIDTH, HEIGTH))
@@ -53,6 +57,7 @@ class Game:
 		# data storing
 		self.assets = {}
 		self.data = {} 
+		self.highscore = 0
 
 		# declare player
 		self.player = Player(0, 380, "Player", 100)
@@ -146,7 +151,34 @@ class Game:
 
 
 		self.assets["lvl3_floor"] = pygame.image.load("./textures/Background3/floor.png")
-		self.assets["lvl3_floor"] = pygame.transform.scale(self.assets["lvl3_floor"], (900, 450)) 
+		self.assets["lvl3_floor"] = pygame.transform.scale(self.assets["lvl3_floor"], (900, 450))  
+
+
+		# load highscore from file 
+		self.load_hs()
+
+
+	def load_hs(self):
+		"""
+		Method for loading old highscore to file
+		"""
+		# load highscore from file 
+		with open('{}'.format(Game.HS_FILE), 'r') as f:
+			try:
+				self.highscore = int(f.read())
+			except: 
+				self.highscore = 0 
+
+
+	def write_hs(self): 
+		# save highscore to file
+		"""
+		Method for saving highscore to file
+		"""
+		with open('{}'.format(Game.HS_FILE), 'w') as f:
+			f.truncate(0) 
+			f.write(str(self.highscore))
+
 
 
 	#-------------------- create bandit method ---------------------------
@@ -213,15 +245,19 @@ class Game:
 		""" 
 		font = pygame.font.Font('freesansbold.ttf', 20)
 		health = font.render(f'Health: {round(self.player.hp, 0)}', True, [255, 255, 255],None) 
-		points = font.render(f'Points: {round(self.player.points, 0)}', True, [255, 255, 255],None)
+		points = font.render(f'Points: {round(self.player.points, 0)}', True, [255, 255, 255],None) 
+		highscore = font.render(f'Highscore: {round(self.highscore, 0)}', True, [255, 255, 255],None)
 
 		textRect = health.get_rect() 
-		pointsRect = points.get_rect()
+		pointsRect = points.get_rect() 
+		highscoreRect = highscore.get_rect()
 
 		textRect.center = (100, 50) 
-		pointsRect.center = (100, 80)
+		pointsRect.center = (100, 80) 
+		highscoreRect.center = (100, 110)
 		Game.WIN.blit(health, textRect)
-		Game.WIN.blit(points, pointsRect) 
+		Game.WIN.blit(points, pointsRect)  
+		Game.WIN.blit(highscore, highscoreRect)
 
 
 	def draw_text(self, surface, text, color, x, y, font_size): 
@@ -274,7 +310,7 @@ class Game:
 				self.state = State.TITLE 
 
 
-	def draw_win(self): 
+	def draw_win(self, extra): 
 		"""
 		Method for win state
 		"""
@@ -294,6 +330,7 @@ class Game:
 				# set text for main screen
 				self.draw_text(Game.WIN, "WINNER!", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/3, 80) 
 				self.draw_text(Game.WIN, "Points: {}".format(self.player.points), [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/3) + 80, 30) 
+				self.draw_text(Game.WIN, "TIME BONUS: {}".format(round(extra)), [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/3) + 160, 40) 
 
 				# set the button on the screen
 				self.end.draw_button(Game.WIN) 
@@ -319,6 +356,7 @@ class Game:
 			
 			# if we click x the game quits
 			if event.type == pygame.QUIT: 
+				self.write_hs()
 				pygame.quit()
 
 			if event.type == pygame.KEYDOWN:
@@ -341,6 +379,7 @@ class Game:
 
 				# jump
 				if event.key == pygame.K_UP or event.key == ord('w'): 
+					self.sounds.jump_sound()
 					self.player.index = 0
 					self.player.is_jumping = True
 					self.animation_action = "jump" 
@@ -386,6 +425,7 @@ class Game:
 			
 			# if we click x the game quits
 			if event.type == pygame.QUIT: 
+				self.write_hs()
 				pygame.quit()
 
 			if event.type == pygame.KEYUP:
@@ -395,7 +435,8 @@ class Game:
 					self.state = self.levels[0] 
 					self.current_level += 1
 					self.player.hp = 100 
-					self.player.points = 0
+					self.player.points = 0 
+					self.player.extra_p = 300 
 					self.isplaying = True
 
 
@@ -411,7 +452,9 @@ class Game:
 
 			# check if bandit is dead
 			if bandit.hp <= 0: 
-				self.player.points += 10
+				self.player.points += 10 
+				if self.player.points > self.highscore: # check if current points are higher than highscore
+					self.highscore += 10 # update high score
 				self.sounds.body_hit_sound()
 				self.bandits.remove(bandit) 
 
@@ -421,6 +464,17 @@ class Game:
 			# check if we killed all enemies in all levels
 			if self.state == State.LVL11:
 				self.finish = True
+				# get elapsed time
+				now = time.time() 
+				elapsed = now - self.player.start_time 
+
+				# extra points for faster finishing
+				self.player.extra_p -= (int(elapsed)*0.1) 
+				if self.player.extra_p < 0:
+					self.player.extra_p = 0 
+					
+				# extra points
+				self.highscore = self.highscore + self.player.extra_p
 				self.state = State.FINISH 
 			
 			else:
@@ -450,12 +504,14 @@ class Game:
 					
 					# reset all settings to 0
 					if self.restart.clicked == True:
+						self.write_hs()
 						self.player.hp = 100 
 						self.bandits = []
 						self.state = State.LVL1 
 						self.current_level = 0 
 						self.isplaying = False
-						self.player.points = 0
+						self.player.points = 0 
+						self.player.extra_p = 300
 
 					# check if player is_jumping boolean is True
 					if self.player.is_jumping:
@@ -481,6 +537,7 @@ class Game:
 					pygame.display.update() 
 				
 				else:
+					self.write_hs()
 					self.state = State.TITLE
 					self.isplaying = False
 			
@@ -532,6 +589,8 @@ class Game:
 				self.main_title()
 			else:
 				if self.state == State.LVL1: 
+					self.player.start_time = time.time()
+					self.player.extra_p = 300
 					self.isplaying = True
 					self.create_bandits(1)
 					self.main()
@@ -576,9 +635,11 @@ class Game:
 					self.create_bandits(11)
 					self.main() 
 				elif self.state == State.GAME_OVER: 
+					self.write_hs()
 					self.draw_game_over() 
 				elif self.state == State.FINISH: 
-					self.draw_win()
+					self.write_hs()
+					self.draw_win(self.player.extra_p)
 
 
 if __name__ == "__main__": 
