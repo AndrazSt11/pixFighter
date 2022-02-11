@@ -5,6 +5,7 @@ from Player import Player
 from Bandit import Bandit
 from Physics import Physics 
 from Sounds import Sounds 
+from Platform import Platform
 from enum import Enum 
 from Button import Button
 from os import path
@@ -60,10 +61,13 @@ class Game:
 		self.highscore = 0
 
 		# declare player
-		self.player = Player(0, 380, "Player", 100)
+		self.player = Player(70, 100, "Player", 100)
 
-		# declare bandit 
+		# list of bandits 
 		self.bandits = [] 
+
+		# list of platforms
+		self.platforms = pygame.sprite.Group()
 
 		# declare sounds object 
 		self.sounds = Sounds() 
@@ -126,6 +130,12 @@ class Game:
 
 		self.assets["lvl1_floor"] = pygame.image.load("./textures/Background/bg4.png")
 		self.assets["lvl1_floor"] = pygame.transform.scale(self.assets["lvl1_floor"], (900, 150)) 
+
+		self.assets["lvl1_floorPL"] = pygame.image.load("./textures/Background/bg4.png") # test platforms
+		self.assets["lvl1_floorPL"] = pygame.transform.scale(self.assets["lvl1_floorPL"], (150, 150)) 
+
+		self.assets["lvl1_floorPL2"] = pygame.image.load("./textures/Background/bg4.png") # test platforms
+		self.assets["lvl1_floorPL2"] = pygame.transform.scale(self.assets["lvl1_floorPL2"], (150, 150)) 
 
 
 		# background lvl 4-7
@@ -202,6 +212,8 @@ class Game:
 			Game.WIN.blit(self.assets["lvl1_mountain"], self.data['ground_heigth'])
 			Game.WIN.blit(self.assets["lvl1_hill"], self.data['hill_position'])
 			Game.WIN.blit(self.assets["lvl1_floor"], self.data['floor_position']) 
+			Game.WIN.blit(self.assets["lvl1_floorPL"], [150, 250]) 
+			Game.WIN.blit(self.assets["lvl1_floorPL2"], [350, 180])
 
 		elif self.current_level > 3 and self.current_level <= 7:
 			Game.WIN.blit(self.assets["lvl2_back"], [0, 0])
@@ -226,7 +238,7 @@ class Game:
 		:param animation_cooldown: integer for animation cooldown
 		"""
 		self.player.update(action, flip, animation_cooldown)
-		Game.WIN.blit(self.player.image, [self.player.x, self.player.y])
+		Game.WIN.blit(self.player.image, [self.player.pos.x, self.player.pos.y])
 
 
 	def draw_bandit(self, player): 
@@ -364,7 +376,8 @@ class Game:
 				# move left 
 				if event.key == pygame.K_LEFT or event.key == ord('a'):
 					self.player.index = 0
-					self.player.control_position(-5, 0)
+					self.player.control_position(-5)
+					self.player.vl = -0.12
 					self.animation_action = "run"
 					self.animation_cooldown = 150
 					self.flip = True
@@ -372,7 +385,8 @@ class Game:
 				# move right
 				if event.key == pygame.K_RIGHT or event.key == ord('d'):
 					self.player.index = 0
-					self.player.control_position(5, 0)
+					self.player.control_position(5)
+					self.player.vl = -0.12
 					self.animation_action = "run" 
 					self.animation_cooldown = 150
 					self.flip = False 
@@ -396,12 +410,14 @@ class Game:
 			if event.type == pygame.KEYUP:
 
 				if event.key == pygame.K_LEFT or event.key == ord('a'):
-					self.player.control_position(5, 0)
+					self.player.control_position(5)
+					self.player.vl = 0
 					self.player.index = 0 
 					self.animation_action = "idle"
 
 				if event.key == pygame.K_RIGHT or event.key == ord('d'):
-					self.player.control_position(-5, 0)
+					self.player.control_position(-5)
+					self.player.vl = 0
 					self.player.index = 0
 					self.animation_action = "idle"
 
@@ -447,7 +463,7 @@ class Game:
 		"""
 		for bandit in self.bandits: 
 			# move bandits until they reach the player
-			if not (bandit.x <= (self.player.x + 30) and bandit.x >= self.player.x - 30):
+			if not (bandit.x <= (self.player.pos.x + 30) and bandit.x >= self.player.pos.x - 30):
 				bandit.move_towards_player(self.player) 
 
 			# check if bandit is dead
@@ -469,12 +485,14 @@ class Game:
 				elapsed = now - self.player.start_time 
 
 				# extra points for faster finishing
-				self.player.extra_p -= (int(elapsed)*0.1) 
+				self.player.extra_p -= (int(elapsed)*0.5) 
 				if self.player.extra_p < 0:
 					self.player.extra_p = 0 
 					
 				# extra points
-				self.highscore = self.highscore + self.player.extra_p
+				if (self.player.points + self.player.extra_p) > self.highscore:
+					self.highscore = round(self.player.points + self.player.extra_p) 
+
 				self.state = State.FINISH 
 			
 			else:
@@ -515,7 +533,14 @@ class Game:
 
 					# check if player is_jumping boolean is True
 					if self.player.is_jumping:
-						self.player.jumping()
+						self.player.jumping() 
+
+
+					# check for platforms
+					hits = pygame.sprite.spritecollide(self.player, self.platforms, False)
+					if hits:
+						self.player.pos.y = hits[0].rect.top
+						self.player.vel.y = 0
 
 					# draws background
 					self.draw_background()
@@ -577,6 +602,15 @@ class Game:
 		# call load functions
 		self.init()
 		self.load() 
+
+		# create platforms
+		p1 = Platform(0, 380, Game.WIDTH, 40)
+		p2 = Platform(150, 250, 25, 150) 
+		p3 = Platform(350, 190, 25, 150)
+		self.platforms.add(p1)
+		self.platforms.add(p2)
+		self.platforms.add(p3)
+
 		pygame.init() 
 
 		self.sounds.background_music()
@@ -591,6 +625,7 @@ class Game:
 				if self.state == State.LVL1: 
 					self.player.start_time = time.time()
 					self.player.extra_p = 300
+					self.player.points = 0
 					self.isplaying = True
 					self.create_bandits(1)
 					self.main()

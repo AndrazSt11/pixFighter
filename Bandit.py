@@ -11,7 +11,8 @@ class Bandit:
 		:param x: starting x coordinate of a player
 		:param y: starting y coordinate of a player
 		:param hp: health of a user
-		"""
+		""" 
+		pygame.sprite.Sprite.__init__(self)
 
 		# bandit data
 		self.x = x
@@ -40,46 +41,32 @@ class Bandit:
 		# sounds
 		self.sounds = Sounds()
 
-		# idle images
-		current_list = []
-		for i in range(3): 
-			img = pygame.image.load(f"./textures/Sprites/Heavy/Idle/HeavyBandit_Idle_{i}.png")
-			img = pygame.transform.scale(img, (150, 100))
-			current_list.append(img)
-		
-		self.animation["idle"] = current_list # add action to database of animations 
-
-		# run images
-		current_list = []
-		for i in range(7): 
-			img = pygame.image.load(f"./textures/Sprites/Heavy/Run/HeavyBandit_Run_{i}.png")
-			img = pygame.transform.scale(img, (150, 100))
-			current_list.append(img)
-		
-		self.animation["run"] = current_list # add action to database of animations
-
-		# attack images
-		current_list = []
-		for i in range(7): 
-			img = pygame.image.load(f"./textures/Sprites/Heavy/Attack/HeavyBandit_Attack_{i}.png")
-			img = pygame.transform.scale(img, (150, 100))
-			current_list.append(img)
-		
-		self.animation["attack"] = current_list # add action to database of animations 
-
-		# hurt images
-		current_list = []
-		for i in range(1): 
-			img = pygame.image.load(f"./textures/Sprites/Heavy/Hurt/HeavyBandit_Hurt_{i}.png")
-			img = pygame.transform.scale(img, (150, 100))
-			current_list.append(img)
-		
-		self.animation["hurt"] = current_list # add action to database of animations 
+		# load images for sprites
+		self.animation["idle"] = self.load_sprites("./textures/Sprites/Heavy/Idle/HeavyBandit_Idle_{}.png", 3)
+		self.animation["run"] = self.load_sprites("./textures/Sprites/Heavy/Run/HeavyBandit_Run_{}.png", 7)
+		self.animation["attack"] = self.load_sprites("./textures/Sprites/Heavy/Attack/HeavyBandit_Attack_{}.png", 7) 		
+		self.animation["hurt"] = self.load_sprites("./textures/Sprites/Heavy/Hurt/HeavyBandit_Hurt_{}.png", 1) 
 
 		animation_data = self.animation["run"]
 		self.image = animation_data[self.index]
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y) 
+
+
+	def load_sprites(self, path, rg):
+		"""
+		Method for loading sprites
+		:param path: path to the images 
+		:param rg: num of images in sprite
+		:return current_list: list of sprites
+		"""
+		current_list = []
+		for i in range(rg): 
+			img = pygame.image.load(path.format(i))
+			img = pygame.transform.scale(img, (150, 100))
+			current_list.append(img) 
+
+		return current_list
 
 
 	def update(self, player):
@@ -89,7 +76,7 @@ class Bandit:
 		:param player: a player that is in the game
 		""" 
 
-		if player.x < self.x:
+		if player.pos.x < self.x:
 			# update image
 			self.image = self.animation[self.action][self.index]
 		else: 
@@ -103,7 +90,7 @@ class Bandit:
 		# check if bandit has reached the player or near player location, to put 
 		# animation to idle else to run 
 		if self.hurt_time == 5:
-			if self.x <= (player.x + 30) and self.x >= player.x - 30:
+			if player.pos.x - 30 <= self.x <= (player.pos.x + 30) and player.pos.y - 30 <= self.y <= (player.pos.y + 30):
 				self.action="attack" 
 				self.animation_cooldown = 100 
 				self.attack_player(player)
@@ -127,7 +114,7 @@ class Bandit:
 		""" 
 
 		# direction vector between player and bandit
-		dx, dy = player.x - self.x, player.y - self.y
+		dx, dy = player.pos.x - self.x, player.pos.y - self.y
 		dist = math.hypot(dx, dy)
 
 		# check if bandit and player are 0 distance away
@@ -145,7 +132,7 @@ class Bandit:
 		"""
 		
 		# direction vector between player and bandit
-		dx, dy = player.x - self.x, player.y - self.y
+		dx, dy = player.pos.x - self.x, player.pos.y - self.y
 		dist = math.hypot(dx, dy) 
 
 		# check if bandit and player are 0 distance away

@@ -8,30 +8,33 @@ class Physics:
         physics = None 
 
 
-    def control_position(self, x, y, moveX, moveY):
+    def control_position(self, player_acc, acc):
         """
 		Contol movement of a player
-		:param x: new x coordinate
-		:param y: new y coordinate
-        :param moveX: updating x value 
-        :param moveY: updating y value
+		:param player_acc: player acceloration 
+        :param acc: x and y of acc 
+        :return acc
 		""" 
 
-        moveX += x
-        moveY += y 
+        acc.x += player_acc
 
-        return moveX, moveY 
+        return acc 
 
 
-    def update_movement(self, x, y, moveX, moveY): 
+    def update_movement(self, pos, vel, acc): 
         """
         Update position of a player 
-        :param x: current x of a player
-        :param y: current y of a player 
-        :param moveX: updating x value
-        :param moveY: updating y value
+        :param pos: current pos of a player 
+        :param vel: velocity of a player
+        :param acc: acc of player 
+        :return pos: new x and y coordinates 
         """ 
-        x += moveX 
-        y += moveY 
 
-        return x, y 
+        vel += acc
+        pos.y += vel.y + 0.5 * acc.y
+        pos += acc
+
+        #pos.x += acc.x
+        #pos.y += acc.y
+
+        return pos
