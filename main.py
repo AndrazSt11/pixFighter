@@ -131,11 +131,8 @@ class Game:
 		self.assets["lvl1_floor"] = pygame.image.load("./textures/Background/bg4.png")
 		self.assets["lvl1_floor"] = pygame.transform.scale(self.assets["lvl1_floor"], (900, 150)) 
 
-		self.assets["lvl1_floorPL"] = pygame.image.load("./textures/Background/bg4.png") # test platforms
+		self.assets["lvl1_floorPL"] = pygame.image.load("./textures/Background/bg4.png")
 		self.assets["lvl1_floorPL"] = pygame.transform.scale(self.assets["lvl1_floorPL"], (150, 150)) 
-
-		self.assets["lvl1_floorPL2"] = pygame.image.load("./textures/Background/bg4.png") # test platforms
-		self.assets["lvl1_floorPL2"] = pygame.transform.scale(self.assets["lvl1_floorPL2"], (150, 150)) 
 
 
 		# background lvl 4-7
@@ -155,6 +152,10 @@ class Game:
 		self.assets["lvl2_floor"] = pygame.transform.scale(self.assets["lvl2_floor"], (900, 150)) 
 
 
+		self.assets["lvl2_floorPL"] = pygame.image.load("./textures/Background2/clouds_mg_3.png")
+		self.assets["lvl2_floorPL"] = pygame.transform.scale(self.assets["lvl2_floorPL"], (150, 150)) 
+
+
 		# background lvl 8-10
 		self.assets["lvl3_back"] = pygame.image.load("./textures/Background3/back.png").convert()
 		self.assets["lvl3_back"] = pygame.transform.scale(self.assets["lvl3_back"], (900, 500))
@@ -162,6 +163,10 @@ class Game:
 
 		self.assets["lvl3_floor"] = pygame.image.load("./textures/Background3/floor.png")
 		self.assets["lvl3_floor"] = pygame.transform.scale(self.assets["lvl3_floor"], (900, 450))  
+
+
+		self.assets["lvl3_floorPL"] = pygame.image.load("./textures/Background3/floor.png")
+		self.assets["lvl3_floorPL"] = pygame.transform.scale(self.assets["lvl3_floorPL"], (150, 150))
 
 
 		# load highscore from file 
@@ -212,18 +217,21 @@ class Game:
 			Game.WIN.blit(self.assets["lvl1_mountain"], self.data['ground_heigth'])
 			Game.WIN.blit(self.assets["lvl1_hill"], self.data['hill_position'])
 			Game.WIN.blit(self.assets["lvl1_floor"], self.data['floor_position']) 
-			Game.WIN.blit(self.assets["lvl1_floorPL"], [150, 250]) 
-			Game.WIN.blit(self.assets["lvl1_floorPL2"], [350, 180])
+			Game.WIN.blit(self.assets["lvl1_floorPL"], [150, 250])
+			Game.WIN.blit(self.assets["lvl1_floorPL"], [450, 200])
 
 		elif self.current_level > 3 and self.current_level <= 7:
 			Game.WIN.blit(self.assets["lvl2_back"], [0, 0])
 			Game.WIN.blit(self.assets["lvl2_mountain"], self.data['ground_heigth'])
 			Game.WIN.blit(self.assets["lvl2_hill"], self.data['hill_position'])
 			Game.WIN.blit(self.assets["lvl2_floor"], self.data['floor_position']) 
+			Game.WIN.blit(self.assets["lvl2_floorPL"], [100, 200])
+			Game.WIN.blit(self.assets["lvl2_floorPL"], [590, 220])
 
 		else: 
 			Game.WIN.blit(self.assets["lvl3_back"], [0, 0])
 			Game.WIN.blit(self.assets["lvl3_floor"], [0, 80]) 
+			Game.WIN.blit(self.assets["lvl1_floorPL"], [590, 220])
 
 		# draw buttons
 		self.back.draw_button(Game.WIN) 
@@ -536,11 +544,12 @@ class Game:
 						self.player.jumping() 
 
 
-					# check for platforms
-					hits = pygame.sprite.spritecollide(self.player, self.platforms, False)
-					if hits:
-						self.player.pos.y = hits[0].rect.top
-						self.player.vel.y = 0
+					# check for platforms (jump only if the player is falling)
+					if self.player.vel.y > 0:
+						hits = pygame.sprite.spritecollide(self.player, self.platforms, False)
+						if hits:
+							self.player.pos.y = hits[0].rect.top
+							self.player.vel.y = 0
 
 					# draws background
 					self.draw_background()
@@ -604,25 +613,30 @@ class Game:
 		self.load() 
 
 		# create platforms
-		p1 = Platform(0, 380, Game.WIDTH, 40)
-		p2 = Platform(150, 250, 25, 150) 
-		p3 = Platform(350, 190, 25, 150)
-		self.platforms.add(p1)
-		self.platforms.add(p2)
-		self.platforms.add(p3)
+		floor = Platform(0, 380, Game.WIDTH, 40)
+		self.platforms.add(floor)
 
 		pygame.init() 
-
+		
+		# start background music
 		self.sounds.background_music()
 
 		while self.run: 
+			# menu state
 			if self.state == State.TITLE: 
 				self.current_level = 0
 				self.back.clicked = False 
 				self.bandits = []
 				self.main_title()
+			# level states
 			else:
 				if self.state == State.LVL1: 
+					# create platforms for this level
+					platform2 = Platform(150, 250, 25, 150) 
+					platform3 = Platform(450, 200, 25, 150)
+					self.platforms.add(platform2)
+					self.platforms.add(platform3)
+
 					self.player.start_time = time.time()
 					self.player.extra_p = 300
 					self.player.points = 0
@@ -638,6 +652,16 @@ class Game:
 					self.create_bandits(3)
 					self.main()
 				elif self.state == State.LVL4: 
+					# remove old platforms
+					self.platforms.remove(platform2)
+					self.platforms.remove(platform3) 
+
+					# create platforms for this level
+					platform4 = Platform(100, 200, 25, 150) 
+					platform5 = Platform(590, 220, 25, 150)
+					self.platforms.add(platform4)
+					self.platforms.add(platform5)
+
 					self.isplaying = True
 					self.create_bandits(4)
 					self.main() 

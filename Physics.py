@@ -34,7 +34,4 @@ class Physics:
         pos.y += vel.y + 0.5 * acc.y
         pos += acc
 
-        #pos.x += acc.x
-        #pos.y += acc.y
-
         return pos
