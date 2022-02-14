@@ -1,13 +1,15 @@
 import time
 import pygame
 import random
+
 from Player import Player
 from Bandit import Bandit
-from Physics import Physics 
 from Sounds import Sounds 
 from Platform import Platform
-from enum import Enum 
+from Health import Health
 from Button import Button
+
+from enum import Enum
 from os import path
 
 
@@ -66,8 +68,9 @@ class Game:
 		# list of bandits 
 		self.bandits = [] 
 
-		# list of platforms
-		self.platforms = pygame.sprite.Group()
+		# sprite groups
+		self.platforms = pygame.sprite.Group() 
+		self.healths = pygame.sprite.Group()
 
 		# declare sounds object 
 		self.sounds = Sounds() 
@@ -168,6 +171,9 @@ class Game:
 		self.assets["lvl3_floorPL"] = pygame.image.load("./textures/Background3/floor.png")
 		self.assets["lvl3_floorPL"] = pygame.transform.scale(self.assets["lvl3_floorPL"], (150, 150))
 
+		# load health image 
+		self.assets["health"] = pygame.image.load("./textures/Health/Health.png")
+		self.assets["health"] = pygame.transform.scale(self.assets["health"], (50, 50))
 
 		# load highscore from file 
 		self.load_hs()
@@ -197,12 +203,17 @@ class Game:
 
 
 	#-------------------- create bandit method ---------------------------
-	def create_bandits(self, num):
+	def create_bandits(self, num, health, speed, power, is_light=True):
 		"""
 		Method for creating bandits
+		:param num: number of bandits 
+		:param health: health of each bandit
+		:param speed: tuple of range for speed 
+		:param power: power of a bandit
+		:param is_light: boolean parameter for types of bandits
 		"""
 		for i in range(num): 
-			self.bandits.append(Bandit(random.randint(100, 800), 380, 100)) 
+			self.bandits.append(Bandit(random.randint(100, 800), 380, health, speed, power, is_light)) 
 
 
 	#-------------------- draw methods ------------------------------------
@@ -226,7 +237,10 @@ class Game:
 			Game.WIN.blit(self.assets["lvl2_hill"], self.data['hill_position'])
 			Game.WIN.blit(self.assets["lvl2_floor"], self.data['floor_position']) 
 			Game.WIN.blit(self.assets["lvl2_floorPL"], [100, 200])
-			Game.WIN.blit(self.assets["lvl2_floorPL"], [590, 220])
+			Game.WIN.blit(self.assets["lvl2_floorPL"], [590, 220]) 
+
+			if self.current_level == 5 and len(self.healths) != 0: 
+				Game.WIN.blit(self.assets["health"], [620, 275])
 
 		else: 
 			Game.WIN.blit(self.assets["lvl3_back"], [0, 0])
@@ -507,7 +521,6 @@ class Game:
 				# update to new level
 				self.state = self.levels[self.current_level]
 				self.current_level += 1
-				#self.levels = self.levels[self.current_level]
 
 
 	#------------------------ main state loop methods ---------------------------
@@ -549,7 +562,18 @@ class Game:
 						hits = pygame.sprite.spritecollide(self.player, self.platforms, False)
 						if hits:
 							self.player.pos.y = hits[0].rect.top
-							self.player.vel.y = 0
+							self.player.vel.y = 0 
+
+					# check if player gets health and update it
+					hits = pygame.sprite.spritecollide(self.player, self.healths, True)
+					if hits:
+						hlth = self.player.hp + 30
+						if hlth > 100:
+							self.player.hp = 100
+						else:
+							self.player.hp = hlth
+
+
 
 					# draws background
 					self.draw_background()
@@ -641,15 +665,15 @@ class Game:
 					self.player.extra_p = 300
 					self.player.points = 0
 					self.isplaying = True
-					self.create_bandits(1)
+					self.create_bandits(1, 100, (2, 4), 1)
 					self.main()
 				elif self.state == State.LVL2: 
 					self.isplaying = True
-					self.create_bandits(2)
+					self.create_bandits(2, 100, (2, 5), 1.5)
 					self.main()
 				elif self.state == State.LVL3:
 					self.isplaying = True 
-					self.create_bandits(3)
+					self.create_bandits(3, 100, (2, 5), 1.5)
 					self.main()
 				elif self.state == State.LVL4: 
 					# remove old platforms
@@ -663,35 +687,46 @@ class Game:
 					self.platforms.add(platform5)
 
 					self.isplaying = True
-					self.create_bandits(4)
+					self.create_bandits(2, 100, (2, 5), 1.5)
+					self.create_bandits(2, 150, (4, 8), 2, False)
 					self.main() 
 				elif self.state == State.LVL5: 
+					# add health 
+					hl1 = Health(620, 275)
+					self.healths.add(hl1)
+
 					self.isplaying = True
-					self.create_bandits(5)
+					self.create_bandits(2, 100, (2, 5), 1.5)
+					self.create_bandits(3, 200, (4, 8), 2, False)
 					self.main()
 				elif self.state == State.LVL6: 
 					self.isplaying = True
-					self.create_bandits(6)
+					self.create_bandits(3, 100, (2, 5), 1.5)
+					self.create_bandits(3, 200, (4, 8), 2, False)
 					self.main()
 				elif self.state == State.LVL7: 
 					self.isplaying = True
-					self.create_bandits(7)
+					self.create_bandits(2, 100, (2, 5), 1.5)
+					self.create_bandits(5, 200, (4, 8), 2.3, False)
 					self.main()
 				elif self.state == State.LVL8: 
 					self.isplaying = True
-					self.create_bandits(8)
+					self.create_bandits(2, 100, (2, 5), 1.5)
+					self.create_bandits(6, 200, (4, 8), 2, False)
 					self.main()
 				elif self.state == State.LVL9: 
 					self.isplaying = True
-					self.create_bandits(9)
+					self.create_bandits(2, 100, (2, 5), 1.5)
+					self.create_bandits(7, 200, (4, 8), 2, False)
 					self.main()
 				elif self.state == State.LVL10: 
 					self.isplaying = True
-					self.create_bandits(10)
+					self.create_bandits(4, 100, (2, 5), 1.5)
+					self.create_bandits(6, 200, (4, 8), 2, False)
 					self.main()
 				elif self.state == State.LVL11: 
 					self.isplaying = True
-					self.create_bandits(11)
+					self.create_bandits(11, 200, (4, 8), 2, False)
 					self.main() 
 				elif self.state == State.GAME_OVER: 
 					self.write_hs()

@@ -5,12 +5,15 @@ from Sounds import Sounds
 
 
 class Bandit: 
-	def __init__(self, x, y, hp): 
+	def __init__(self, x, y, hp, speed, power, is_light): 
 		"""
 		A class of a bandit
 		:param x: starting x coordinate of a player
 		:param y: starting y coordinate of a player
-		:param hp: health of a user
+		:param hp: health of a user 
+		:param velocity: tuple of range for speed
+		:param power: power of a bandit
+		:param is_light: boolean for changing between light and heavy bandit sprites
 		""" 
 		pygame.sprite.Sprite.__init__(self)
 
@@ -21,10 +24,11 @@ class Bandit:
 		self.moveY = 0
 		self.hp = hp
 		self.alive = True 
+		self.power = power
 
 		# bandit jumping
 		self.is_jumping = False
-		self.velocity = random.randint(2,4) # create a bandit with random speed of running
+		self.velocity = random.randint(speed[0], speed[1]) # create a bandit with random speed of running
 		self.mass = 1
 
 		# animation
@@ -41,11 +45,19 @@ class Bandit:
 		# sounds
 		self.sounds = Sounds()
 
-		# load images for sprites
-		self.animation["idle"] = self.load_sprites("./textures/Sprites/Heavy/Idle/HeavyBandit_Idle_{}.png", 3)
-		self.animation["run"] = self.load_sprites("./textures/Sprites/Heavy/Run/HeavyBandit_Run_{}.png", 7)
-		self.animation["attack"] = self.load_sprites("./textures/Sprites/Heavy/Attack/HeavyBandit_Attack_{}.png", 7) 		
-		self.animation["hurt"] = self.load_sprites("./textures/Sprites/Heavy/Hurt/HeavyBandit_Hurt_{}.png", 1) 
+		# load images for sprites 
+		if is_light:
+			# sprites of light bandit
+			self.animation["idle"] = self.load_sprites("./textures/Sprites/LightBandit/Idle/LightBandit_Idle_{}.png", 3)
+			self.animation["run"] = self.load_sprites("./textures/Sprites/LightBandit/Run/LightBandit_Run_{}.png", 7)
+			self.animation["attack"] = self.load_sprites("./textures/Sprites/LightBandit/Attack/LightBandit_Attack_{}.png", 7) 		
+			self.animation["hurt"] = self.load_sprites("./textures/Sprites/LightBandit/Hurt/LightBandit_Hurt_{}.png", 1) 
+		else:
+			# sprites of heavy bandit
+			self.animation["idle"] = self.load_sprites("./textures/Sprites/Heavy/Idle/HeavyBandit_Idle_{}.png", 3)
+			self.animation["run"] = self.load_sprites("./textures/Sprites/Heavy/Run/HeavyBandit_Run_{}.png", 7)
+			self.animation["attack"] = self.load_sprites("./textures/Sprites/Heavy/Attack/HeavyBandit_Attack_{}.png", 7) 		
+			self.animation["hurt"] = self.load_sprites("./textures/Sprites/Heavy/Hurt/HeavyBandit_Hurt_{}.png", 1) 
 
 		animation_data = self.animation["run"]
 		self.image = animation_data[self.index]
@@ -137,7 +149,7 @@ class Bandit:
 
 		# check if bandit and player are 0 distance away
 		if dist != 0 and pygame.time.get_ticks() - self.update_time_attack > 680: 
-			player.hp -= 1
+			player.hp -= self.power
 			self.update_time_attack = pygame.time.get_ticks()
 			self.sounds.hit_sound()
 
