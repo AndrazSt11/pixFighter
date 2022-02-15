@@ -168,8 +168,8 @@ class Game:
 		self.assets["lvl3_floor"] = pygame.transform.scale(self.assets["lvl3_floor"], (900, 450))  
 
 
-		self.assets["lvl3_floorPL"] = pygame.image.load("./textures/Background3/floor.png")
-		self.assets["lvl3_floorPL"] = pygame.transform.scale(self.assets["lvl3_floorPL"], (150, 150))
+		self.assets["lvl3_floorPL"] = pygame.image.load("./textures/Background3/lvl3_platform.png")
+		self.assets["lvl3_floorPL"] = pygame.transform.scale(self.assets["lvl3_floorPL"], (150, 50))
 
 		# load health image 
 		self.assets["health"] = pygame.image.load("./textures/Health/Health.png")
@@ -228,16 +228,16 @@ class Game:
 			Game.WIN.blit(self.assets["lvl1_mountain"], self.data['ground_heigth'])
 			Game.WIN.blit(self.assets["lvl1_hill"], self.data['hill_position'])
 			Game.WIN.blit(self.assets["lvl1_floor"], self.data['floor_position']) 
-			Game.WIN.blit(self.assets["lvl1_floorPL"], [150, 250])
-			Game.WIN.blit(self.assets["lvl1_floorPL"], [450, 200])
+			Game.WIN.blit(self.assets["lvl1_floorPL"], [150, 240])
+			Game.WIN.blit(self.assets["lvl1_floorPL"], [450, 190])
 
 		elif self.current_level > 3 and self.current_level <= 7:
 			Game.WIN.blit(self.assets["lvl2_back"], [0, 0])
 			Game.WIN.blit(self.assets["lvl2_mountain"], self.data['ground_heigth'])
 			Game.WIN.blit(self.assets["lvl2_hill"], self.data['hill_position'])
 			Game.WIN.blit(self.assets["lvl2_floor"], self.data['floor_position']) 
-			Game.WIN.blit(self.assets["lvl2_floorPL"], [100, 200])
-			Game.WIN.blit(self.assets["lvl2_floorPL"], [590, 220]) 
+			Game.WIN.blit(self.assets["lvl2_floorPL"], [100, 195])
+			Game.WIN.blit(self.assets["lvl2_floorPL"], [590, 215]) 
 
 			if self.current_level == 5 and len(self.healths) != 0: 
 				Game.WIN.blit(self.assets["health"], [620, 275])
@@ -245,7 +245,14 @@ class Game:
 		else: 
 			Game.WIN.blit(self.assets["lvl3_back"], [0, 0])
 			Game.WIN.blit(self.assets["lvl3_floor"], [0, 80]) 
-			Game.WIN.blit(self.assets["lvl1_floorPL"], [590, 220])
+			Game.WIN.blit(self.assets["lvl3_floorPL"], [590, 315])
+			Game.WIN.blit(self.assets["lvl3_floorPL"], [200, 275]) 
+
+			if self.current_level == 8 and len(self.healths) != 0: 
+				Game.WIN.blit(self.assets["health"], [230, 240]) 
+
+			if self.current_level == 10 and len(self.healths) != 0: 
+				Game.WIN.blit(self.assets["health"], [620, 280]) 
 
 		# draw buttons
 		self.back.draw_button(Game.WIN) 
@@ -398,7 +405,7 @@ class Game:
 				# move left 
 				if event.key == pygame.K_LEFT or event.key == ord('a'):
 					self.player.index = 0
-					self.player.control_position(-5)
+					self.player.control_position(-7)
 					self.player.vl = -0.12
 					self.animation_action = "run"
 					self.animation_cooldown = 150
@@ -407,7 +414,7 @@ class Game:
 				# move right
 				if event.key == pygame.K_RIGHT or event.key == ord('d'):
 					self.player.index = 0
-					self.player.control_position(5)
+					self.player.control_position(7)
 					self.player.vl = -0.12
 					self.animation_action = "run" 
 					self.animation_cooldown = 150
@@ -432,16 +439,17 @@ class Game:
 			if event.type == pygame.KEYUP:
 
 				if event.key == pygame.K_LEFT or event.key == ord('a'):
-					self.player.control_position(5)
+					self.player.control_position(7)
 					self.player.vl = 0
 					self.player.index = 0 
 					self.animation_action = "idle"
 
 				if event.key == pygame.K_RIGHT or event.key == ord('d'):
-					self.player.control_position(-5)
+					self.player.control_position(-7)
 					self.player.vl = 0
 					self.player.index = 0
 					self.animation_action = "idle"
+
 
 				if event.key == pygame.K_UP or event.key == ord('w'):
 					self.player.index = 0
@@ -571,7 +579,8 @@ class Game:
 						if hlth > 100:
 							self.player.hp = 100
 						else:
-							self.player.hp = hlth
+							self.player.hp = hlth 
+						self.sounds.healup_sound()
 
 
 
@@ -692,7 +701,7 @@ class Game:
 					self.main() 
 				elif self.state == State.LVL5: 
 					# add health 
-					hl1 = Health(620, 275)
+					hl1 = Health(620, 215)
 					self.healths.add(hl1)
 
 					self.isplaying = True
@@ -710,23 +719,42 @@ class Game:
 					self.create_bandits(5, 200, (4, 8), 2.3, False)
 					self.main()
 				elif self.state == State.LVL8: 
+					# add health 
+					hl2 = Health(230, 180)
+					self.healths.add(hl2)
+
+					# remove current platforms
+					self.platforms.remove(platform4)
+					self.platforms.remove(platform5) 
+
+					# add new platforms
+					platform6 = Platform(200, 180, 25, 150) 
+					platform7 = Platform(590, 220, 25, 150)
+					self.platforms.add(platform6)
+					self.platforms.add(platform7)
+
 					self.isplaying = True
 					self.create_bandits(2, 100, (2, 5), 1.5)
-					self.create_bandits(6, 200, (4, 8), 2, False)
+					self.create_bandits(6, 200, (4, 7), 2, False)
 					self.main()
 				elif self.state == State.LVL9: 
 					self.isplaying = True
 					self.create_bandits(2, 100, (2, 5), 1.5)
-					self.create_bandits(7, 200, (4, 8), 2, False)
+					self.create_bandits(7, 200, (4, 7), 2, False)
 					self.main()
 				elif self.state == State.LVL10: 
+					# add health 
+					hl3 = Health(620, 220)
+					self.healths.add(hl3)
+
+
 					self.isplaying = True
 					self.create_bandits(4, 100, (2, 5), 1.5)
-					self.create_bandits(6, 200, (4, 8), 2, False)
+					self.create_bandits(6, 200, (4, 7), 2, False)
 					self.main()
 				elif self.state == State.LVL11: 
 					self.isplaying = True
-					self.create_bandits(11, 200, (4, 8), 2, False)
+					self.create_bandits(11, 200, (4, 7), 2, False)
 					self.main() 
 				elif self.state == State.GAME_OVER: 
 					self.write_hs()
