@@ -42,7 +42,15 @@ class Game:
 	FPS = 60 
 
 	# high score file 
-	HS_FILE = "highscore.txt"
+	HS_FILE = "highscore.txt" 
+
+	# intro text
+	INTRO_TEXT1 = "You've found yourself in a strange place called Emiphia."
+	INTRO_TEXT2 = "No foreigners are allowed, so everyone that sees you is attacking you,"
+	INTRO_TEXT3 = "so you have to fight back if you want to survive." 
+	INTRO_TEXT4 = "But remember, you'll have to be very careful! The enemies are very powerful," 
+	INTRO_TEXT5 = "so you'll have to be very strong to get them all to get out of Emiphia." 
+	INTRO_TEXT6 = "Do it as fast as you can to gain more poins. GOOD LUCK!"
 
 	# game window
 	WIN = pygame.display.set_mode((WIDTH, HEIGTH))
@@ -96,7 +104,6 @@ class Game:
 		self.back = Button(780, 20, 'Back') 
 		self.restart = Button(780, 60, 'Restart') 
 		self.end = Button(400, 400, 'End')
-
 
 
 	# ------------------- load methods -------------------------------
@@ -192,14 +199,12 @@ class Game:
 
 
 	def write_hs(self): 
-		# save highscore to file
 		"""
 		Method for saving highscore to file
 		"""
 		with open('{}'.format(Game.HS_FILE), 'w') as f:
 			f.truncate(0) 
 			f.write(str(self.highscore))
-
 
 
 	#-------------------- create bandit method ---------------------------
@@ -287,18 +292,31 @@ class Game:
 		font = pygame.font.Font('freesansbold.ttf', 20)
 		health = font.render(f'Health: {round(self.player.hp, 0)}', True, [255, 255, 255],None) 
 		points = font.render(f'Points: {round(self.player.points, 0)}', True, [255, 255, 255],None) 
-		highscore = font.render(f'Highscore: {round(self.highscore, 0)}', True, [255, 255, 255],None)
+		highscore = font.render(f'Highscore: {round(self.highscore, 0)}', True, [255, 255, 255],None) 
+
+		# movement 
+		movement = font.render("Movement: arrows", True, [255, 255, 255],None) 
+		attack = font.render("Attack: k", True, [255, 255, 255],None)
 
 		textRect = health.get_rect() 
 		pointsRect = points.get_rect() 
-		highscoreRect = highscore.get_rect()
+		highscoreRect = highscore.get_rect() 
+		movementRect = movement.get_rect() 
+		attackRect = attack.get_rect()
 
+		# set coordinates
 		textRect.center = (100, 50) 
 		pointsRect.center = (100, 80) 
-		highscoreRect.center = (100, 110)
+		highscoreRect.center = (100, 110) 
+		movementRect.center = (100, 170)
+		attackRect.center = (100, 200)
+
+		# draw on screen
 		Game.WIN.blit(health, textRect)
 		Game.WIN.blit(points, pointsRect)  
-		Game.WIN.blit(highscore, highscoreRect)
+		Game.WIN.blit(highscore, highscoreRect) 
+		Game.WIN.blit(movement, movementRect) 
+		Game.WIN.blit(attack, attackRect)
 
 
 	def draw_text(self, surface, text, color, x, y, font_size): 
@@ -435,30 +453,27 @@ class Game:
 					self.player.attack(self.bandits)
 					self.sounds.hit_sound()
 
+			else:
+				if event.type == pygame.KEYUP:
+					
+					# on key ups stop player movement 
+					if event.key == pygame.K_LEFT or event.key == ord('a'):
+						self.player.control_position(7)
+						self.player.vl = 0
 
-			if event.type == pygame.KEYUP:
+					if event.key == pygame.K_RIGHT or event.key == ord('d'):
+						self.player.control_position(-7)
+						self.player.vl = 0
 
-				if event.key == pygame.K_LEFT or event.key == ord('a'):
-					self.player.control_position(7)
-					self.player.vl = 0
+					if event.key == ord('k'):
+						self.animation_cooldown = 200 
+
+				# check if any key on a keyboard is pressed, to set sprite movement to idle
+				keys = pygame.key.get_pressed() 
+
+				if True not in keys:
 					self.player.index = 0 
-					self.animation_action = "idle"
-
-				if event.key == pygame.K_RIGHT or event.key == ord('d'):
-					self.player.control_position(-7)
-					self.player.vl = 0
-					self.player.index = 0
-					self.animation_action = "idle"
-
-
-				if event.key == pygame.K_UP or event.key == ord('w'):
-					self.player.index = 0
-					self.animation_action = "idle"
-
-				if event.key == ord('k'):
-					self.player.index = 0
-					self.animation_action = "idle"
-					self.animation_cooldown = 200 
+					self.animation_action = "idle" 
 
 
 	def get_events_title(self):
@@ -515,7 +530,7 @@ class Game:
 				elapsed = now - self.player.start_time 
 
 				# extra points for faster finishing
-				self.player.extra_p -= (int(elapsed)*0.5) 
+				self.player.extra_p -= (int(elapsed)*0.1) 
 				if self.player.extra_p < 0:
 					self.player.extra_p = 0 
 					
@@ -582,13 +597,11 @@ class Game:
 							self.player.hp = hlth 
 						self.sounds.healup_sound()
 
-
-
 					# draws background
 					self.draw_background()
 
 					# draws player
-					self.player.update_movement()
+					self.player.update_movement(Game.WIDTH)
 					self.draw_player(self.animation_action, self.flip, self.animation_cooldown) 
 
 					# bandit update
@@ -630,8 +643,16 @@ class Game:
 			Game.WIN.fill((178, 39, 155))
 
 			# set text for main screen
-			self.draw_text(Game.WIN, "pixFighter", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/3, 80)
-			self.draw_text(Game.WIN, "Press enter to start the game", [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/2) + 100, 20)
+			self.draw_text(Game.WIN, "pixFighter", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7, 80)
+
+			self.draw_text(Game.WIN, Game.INTRO_TEXT1, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 100, 20) 
+			self.draw_text(Game.WIN, Game.INTRO_TEXT2, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 140, 20)
+			self.draw_text(Game.WIN, Game.INTRO_TEXT3, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 180, 20) 
+			self.draw_text(Game.WIN, Game.INTRO_TEXT4, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 220, 20) 
+			self.draw_text(Game.WIN, Game.INTRO_TEXT5, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 260, 20) 
+			self.draw_text(Game.WIN, Game.INTRO_TEXT6, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 300, 20)
+
+			self.draw_text(Game.WIN, "Press enter to start the game", [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/2) + 200, 20)
 
 			# updates display
 			pygame.display.update()
@@ -670,19 +691,24 @@ class Game:
 					self.platforms.add(platform2)
 					self.platforms.add(platform3)
 
+					# set data
 					self.player.start_time = time.time()
 					self.player.extra_p = 300
 					self.player.points = 0
-					self.isplaying = True
+					self.isplaying = True 
+
+					# create bandits and run level
 					self.create_bandits(1, 100, (2, 4), 1)
 					self.main()
 				elif self.state == State.LVL2: 
 					self.isplaying = True
-					self.create_bandits(2, 100, (2, 5), 1.5)
+					
+					self.create_bandits(2, 100, (2, 5), 1.2)
 					self.main()
 				elif self.state == State.LVL3:
 					self.isplaying = True 
-					self.create_bandits(3, 100, (2, 5), 1.5)
+
+					self.create_bandits(3, 100, (2, 5), 1.2)
 					self.main()
 				elif self.state == State.LVL4: 
 					# remove old platforms
@@ -696,8 +722,9 @@ class Game:
 					self.platforms.add(platform5)
 
 					self.isplaying = True
-					self.create_bandits(2, 100, (2, 5), 1.5)
-					self.create_bandits(2, 150, (4, 8), 2, False)
+
+					self.create_bandits(2, 100, (2, 3), 1.2)
+					self.create_bandits(2, 150, (2, 5), 1.3, False)
 					self.main() 
 				elif self.state == State.LVL5: 
 					# add health 
@@ -705,18 +732,22 @@ class Game:
 					self.healths.add(hl1)
 
 					self.isplaying = True
-					self.create_bandits(2, 100, (2, 5), 1.5)
-					self.create_bandits(3, 200, (4, 8), 2, False)
+
+					self.create_bandits(2, 100, (2, 4), 1.2)
+					self.create_bandits(3, 200, (2, 5), 1.3, False)
 					self.main()
-				elif self.state == State.LVL6: 
+				elif self.state == State.LVL6:  
+					self.healths.remove(hl1)
 					self.isplaying = True
-					self.create_bandits(3, 100, (2, 5), 1.5)
-					self.create_bandits(3, 200, (4, 8), 2, False)
+
+					self.create_bandits(3, 100, (2, 4), 1.2)
+					self.create_bandits(3, 200, (2, 5), 1.3, False)
 					self.main()
 				elif self.state == State.LVL7: 
 					self.isplaying = True
-					self.create_bandits(2, 100, (2, 5), 1.5)
-					self.create_bandits(5, 200, (4, 8), 2.3, False)
+
+					self.create_bandits(2, 100, (2, 5), 1.2)
+					self.create_bandits(5, 200, (3, 5), 1.3, False)
 					self.main()
 				elif self.state == State.LVL8: 
 					# add health 
@@ -734,27 +765,32 @@ class Game:
 					self.platforms.add(platform7)
 
 					self.isplaying = True
-					self.create_bandits(2, 100, (2, 5), 1.5)
-					self.create_bandits(6, 200, (4, 7), 2, False)
+
+					self.create_bandits(2, 100, (2, 5), 1.2)
+					self.create_bandits(6, 200, (3, 6), 1.3, False)
 					self.main()
 				elif self.state == State.LVL9: 
+					self.healths.remove(hl2)
 					self.isplaying = True
-					self.create_bandits(2, 100, (2, 5), 1.5)
-					self.create_bandits(7, 200, (4, 7), 2, False)
+
+					self.create_bandits(2, 100, (2, 5), 1.2)
+					self.create_bandits(7, 200, (3, 6), 1.4, False)
 					self.main()
 				elif self.state == State.LVL10: 
 					# add health 
 					hl3 = Health(620, 220)
 					self.healths.add(hl3)
 
-
 					self.isplaying = True
-					self.create_bandits(4, 100, (2, 5), 1.5)
-					self.create_bandits(6, 200, (4, 7), 2, False)
+
+					self.create_bandits(4, 100, (2, 5), 1.4)
+					self.create_bandits(6, 200, (3, 7), 1.7, False)
 					self.main()
 				elif self.state == State.LVL11: 
+					self.healths.remove(hl1)
 					self.isplaying = True
-					self.create_bandits(11, 200, (4, 7), 2, False)
+
+					self.create_bandits(11, 200, (3, 7), 1.7, False)
 					self.main() 
 				elif self.state == State.GAME_OVER: 
 					self.write_hs()

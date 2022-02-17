@@ -82,7 +82,8 @@ class Player(pygame.sprite.Sprite):
 		"""
 		Handle animation
 		:param action: gives name of action that player is preforming (idle by default) 
-		:param flip: bool parameter to flip image when moving to left side
+		:param flip: bool parameter to flip image when moving to left side 
+		:param cooldown: time to wait for next sprite image
 		""" 
 		if flip:
 			# update image
@@ -108,12 +109,20 @@ class Player(pygame.sprite.Sprite):
 		self.acc = physics.control_position(player_acc, self.acc)
 
 
-	def update_movement(self): 
+	def update_movement(self, WIDTH): 
 		"""
-		Move player for calculated distance
+		Move player for calculated distance 
+		:param WIDTH: width of game screen
 		""" 
 		self.acc.y = 2.5
 		self.pos = physics.update_movement(self.pos, self.vel, self.acc) 
+
+		# wrap aroung the sides of the screen
+		if self.pos.x > WIDTH: 
+			self.pos.x = -50
+		if self.pos.x < -50: 
+			self.pos.x = WIDTH
+
 		self.rect.midbottom = self.pos
 
 

@@ -59,6 +59,7 @@ class Bandit:
 			self.animation["attack"] = self.load_sprites("./textures/Sprites/Heavy/Attack/HeavyBandit_Attack_{}.png", 7) 		
 			self.animation["hurt"] = self.load_sprites("./textures/Sprites/Heavy/Hurt/HeavyBandit_Hurt_{}.png", 1) 
 
+		# by default set the animation to run
 		animation_data = self.animation["run"]
 		self.image = animation_data[self.index]
 		self.rect = self.image.get_rect()
@@ -99,8 +100,7 @@ class Bandit:
 			self.update_time = pygame.time.get_ticks()
 			self.index += 1
 
-		# check if bandit has reached the player or near player location, to put 
-		# animation to idle else to run 
+		# check if bandit has reached the player or near player location, to put animation to idle else to run 
 		if self.hurt_time == 5:
 			if player.pos.x - 30 <= self.x <= (player.pos.x + 30) and player.pos.y - 30 <= self.y <= (player.pos.y + 30):
 				self.action="attack" 

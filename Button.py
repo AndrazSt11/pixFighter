@@ -6,13 +6,13 @@ red = (255, 0, 0)
 black = (0, 0, 0)
 white = (255, 255, 255)
 
-#define global variable
+# define global variable
 clicked = False
 counter = 0
 
 class Button:
 		
-    #colours for button
+    # colours for button
     button_col = (179, 21, 153)
     hover_col = (235, 129, 217)
     click_col = (50, 150, 255)
@@ -44,11 +44,11 @@ class Button:
         """
         action = False
 
-        #get mouse position
+        # get mouse position
         pos = pygame.mouse.get_pos()
         button_rect = Rect(self.x, self.y, self.width, self.height)
 
-        #check mouseover and clicked conditions
+        # check mouseover and clicked conditions
         if button_rect.collidepoint(pos):
             if pygame.mouse.get_pressed()[0] == 1:
                 self.clicked = True
@@ -61,7 +61,7 @@ class Button:
         else:
             pygame.draw.rect(screen, self.button_col, button_rect)
 
-        #add text to button
+        # add text to button
         font = pygame.font.Font('freesansbold.ttf', 15)
         text_img = font.render(self.text, True, self.text_col)
         text_len = text_img.get_width()
