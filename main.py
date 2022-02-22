@@ -598,11 +598,17 @@ class Game:
 					# reset all settings to 0
 					if self.restart.clicked == True:
 						self.write_hs()
+
 						self.player.hp = 100 
 						self.bandits = []
+
+						self.platforms.empty()
+						self.platforms.add(Platform(0, 380, Game.WIDTH, 40))
+
 						self.state = State.LVL1 
 						self.current_level = 0 
 						self.isplaying = False
+						
 						self.player.points = 0 
 						self.player.extra_p = 300
 						self.player.pos = vec(70, 100)
@@ -653,8 +659,12 @@ class Game:
 					self.write_hs()
 					self.state = State.TITLE
 					self.isplaying = False
+
 					self.player.pos = vec(70, 100)
 					self.player.vel = vec(0, 0)
+
+					self.platforms.empty()
+					self.platforms.add(Platform(0, 380, Game.WIDTH, 40))
 			
 			else: 
 				self.isplaying = False
