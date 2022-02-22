@@ -161,7 +161,7 @@ class Player(pygame.sprite.Sprite):
 		
 		for bandit in bandits:
 			# direction vector between player and bandit
-			dx, dy = self.pos.x - bandit.x, self.pos.y - bandit.y
+			dx, dy = self.pos.x - bandit.pos.x, self.pos.y - bandit.pos.y
 			dist = math.hypot(dx, dy) 
 
 			# check if bandit and player are 0 distance away

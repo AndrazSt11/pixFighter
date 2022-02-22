@@ -3,6 +3,8 @@ import math
 import random
 from Sounds import Sounds 
 
+# vector 
+vec = pygame.math.Vector2
 
 class Bandit: 
 	def __init__(self, x, y, hp, speed, power, is_light): 
@@ -18,8 +20,7 @@ class Bandit:
 		pygame.sprite.Sprite.__init__(self)
 
 		# bandit data
-		self.x = x
-		self.y = y
+		self.pos = vec(x, y)
 		self.moveX = 0
 		self.moveY = 0
 		self.hp = hp
@@ -89,7 +90,7 @@ class Bandit:
 		:param player: a player that is in the game
 		""" 
 
-		if player.pos.x < self.x:
+		if player.pos.x < self.pos.x:
 			# update image
 			self.image = self.animation[self.action][self.index]
 		else: 
@@ -102,10 +103,13 @@ class Bandit:
 
 		# check if bandit has reached the player or near player location, to put animation to idle else to run 
 		if self.hurt_time == 5:
-			if player.pos.x - 30 <= self.x <= (player.pos.x + 30) and player.pos.y - 30 <= self.y <= (player.pos.y + 30):
+			if player.pos.x - 30 <= self.pos.x <= (player.pos.x + 30) and player.pos.y - 30 <= self.pos.y <= (player.pos.y + 30):
 				self.action="attack" 
 				self.animation_cooldown = 100 
-				self.attack_player(player)
+				self.attack_player(player) 
+			elif player.pos.x - 30 <= self.pos.x <= (player.pos.x + 30):
+				self.action="idle" 
+				self.animation_cooldown = 100 
 			else: 
 				self.action = "run" 
 				self.animation_cooldown = 100 
@@ -126,7 +130,7 @@ class Bandit:
 		""" 
 
 		# direction vector between player and bandit
-		dx, dy = player.pos.x - self.x, player.pos.y - self.y
+		dx, dy = player.pos.x - self.pos.x, player.pos.y - self.pos.y
 		dist = math.hypot(dx, dy)
 
 		# check if bandit and player are 0 distance away
@@ -135,7 +139,8 @@ class Bandit:
 			dx, dy = dx / dist, dy / dist
 
 		# move towards player at current speed
-		self.x += dx * self.velocity 
+		self.pos.x += dx * self.velocity 
+		
 
 	def attack_player(self, player): 
 		"""
@@ -144,7 +149,7 @@ class Bandit:
 		"""
 		
 		# direction vector between player and bandit
-		dx, dy = player.pos.x - self.x, player.pos.y - self.y
+		dx, dy = player.pos.x - self.pos.x, player.pos.y - self.pos.y
 		dist = math.hypot(dx, dy) 
 
 		# check if bandit and player are 0 distance away

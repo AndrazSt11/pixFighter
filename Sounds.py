@@ -49,9 +49,19 @@ class Sounds:
         pygame.init()
         body_hit = pygame.mixer.Sound("./sounds/player/healup.wav")
         body_hit.play() 
-        body_hit.set_volume(0.2)
+        body_hit.set_volume(0.2) 
 
-    
+    def teleport_sound(self): 
+        """
+        Play teleport sound
+        """
+        # sounds
+        pygame.mixer.pre_init(44100, -16, 2, 2048)
+        pygame.init()
+        body_hit = pygame.mixer.Sound("./sounds/player/Teleport.mp3")
+        body_hit.play() 
+        body_hit.set_volume(0.17)
+
     def background_music(self): 
         """
         Play music

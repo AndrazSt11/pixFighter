@@ -6,12 +6,15 @@ from Player import Player
 from Bandit import Bandit
 from Sounds import Sounds 
 from Platform import Platform
+from Portal import Portal
 from Health import Health
 from Button import Button
 
 from enum import Enum
 from os import path
 
+# vector
+vec = pygame.math.Vector2
 
 class State(Enum): 
 	"""
@@ -78,7 +81,8 @@ class Game:
 
 		# sprite groups
 		self.platforms = pygame.sprite.Group() 
-		self.healths = pygame.sprite.Group()
+		self.healths = pygame.sprite.Group() 
+		self.portals = pygame.sprite.Group()
 
 		# declare sounds object 
 		self.sounds = Sounds() 
@@ -124,6 +128,11 @@ class Game:
 		"""
 		Method that loads all the images needed for game
 		"""
+
+		# start background 
+		self.assets["start"] = pygame.image.load("./textures/Background/Start.jpg").convert()
+		self.assets["start"] = pygame.transform.scale(self.assets["start"], (900, 500))
+
 
 		# background lvl 1-3
 		self.assets["lvl1_back"] = pygame.image.load("./textures/Background/bg0.png").convert()
@@ -180,7 +189,11 @@ class Game:
 
 		# load health image 
 		self.assets["health"] = pygame.image.load("./textures/Health/Health.png")
-		self.assets["health"] = pygame.transform.scale(self.assets["health"], (50, 50))
+		self.assets["health"] = pygame.transform.scale(self.assets["health"], (50, 50)) 
+
+		# load portal image 
+		self.assets["portal"] = pygame.image.load("./textures/Portals/portal.png")
+		self.assets["portal"] = pygame.transform.scale(self.assets["portal"], (150, 150))
 
 		# load highscore from file 
 		self.load_hs()
@@ -234,7 +247,10 @@ class Game:
 			Game.WIN.blit(self.assets["lvl1_hill"], self.data['hill_position'])
 			Game.WIN.blit(self.assets["lvl1_floor"], self.data['floor_position']) 
 			Game.WIN.blit(self.assets["lvl1_floorPL"], [150, 240])
-			Game.WIN.blit(self.assets["lvl1_floorPL"], [450, 190])
+			Game.WIN.blit(self.assets["lvl1_floorPL"], [450, 190]) 
+
+			if self.current_level == 3 and len(self.bandits) == 0:
+				Game.WIN.blit(self.assets["portal"], [450, 170])
 
 		elif self.current_level > 3 and self.current_level <= 7:
 			Game.WIN.blit(self.assets["lvl2_back"], [0, 0])
@@ -245,7 +261,10 @@ class Game:
 			Game.WIN.blit(self.assets["lvl2_floorPL"], [590, 215]) 
 
 			if self.current_level == 5 and len(self.healths) != 0: 
-				Game.WIN.blit(self.assets["health"], [620, 275])
+				Game.WIN.blit(self.assets["health"], [620, 275]) 
+
+			if self.current_level == 7 and len(self.bandits) == 0:
+				Game.WIN.blit(self.assets["portal"], [590, 200])
 
 		else: 
 			Game.WIN.blit(self.assets["lvl3_back"], [0, 0])
@@ -282,7 +301,7 @@ class Game:
 		"""
 		for bandit in self.bandits:
 			bandit.update(player)
-			Game.WIN.blit(bandit.image, [bandit.x, bandit.y]) 
+			Game.WIN.blit(bandit.image, [bandit.pos.x, bandit.pos.y]) 
 
 
 	def draw_player_data(self): 
@@ -508,7 +527,7 @@ class Game:
 		"""
 		for bandit in self.bandits: 
 			# move bandits until they reach the player
-			if not (bandit.x <= (self.player.pos.x + 30) and bandit.x >= self.player.pos.x - 30):
+			if not (bandit.pos.x <= (self.player.pos.x + 30) and bandit.pos.x >= self.player.pos.x - 30):
 				bandit.move_towards_player(self.player) 
 
 			# check if bandit is dead
@@ -520,10 +539,10 @@ class Game:
 				self.bandits.remove(bandit) 
 
 		if len(self.bandits) == 0: 
-			self.isplaying = False 
 
 			# check if we killed all enemies in all levels
 			if self.state == State.LVL11:
+				self.isplaying = False 
 				self.finish = True
 				# get elapsed time
 				now = time.time() 
@@ -541,9 +560,19 @@ class Game:
 				self.state = State.FINISH 
 			
 			else:
-				# update to new level
-				self.state = self.levels[self.current_level]
-				self.current_level += 1
+				if self.current_level in [3, 7]:
+					# check if player gets health and update it
+					hits = pygame.sprite.spritecollide(self.player, self.portals, True)
+					if hits:
+						self.sounds.teleport_sound()
+						self.isplaying = False 
+						self.state = self.levels[self.current_level]
+						self.current_level += 1
+				else:
+					self.isplaying = False 
+					# update to new level
+					self.state = self.levels[self.current_level]
+					self.current_level += 1
 
 
 	#------------------------ main state loop methods ---------------------------
@@ -551,6 +580,8 @@ class Game:
 		"""
 		Main playing method
 		"""
+
+		pygame.event.clear()
 
 		while self.isplaying: 
 
@@ -574,6 +605,8 @@ class Game:
 						self.isplaying = False
 						self.player.points = 0 
 						self.player.extra_p = 300
+						self.player.pos = vec(70, 100)
+						self.player.vel = vec(0, 0)
 
 					# check if player is_jumping boolean is True
 					if self.player.is_jumping:
@@ -620,6 +653,8 @@ class Game:
 					self.write_hs()
 					self.state = State.TITLE
 					self.isplaying = False
+					self.player.pos = vec(70, 100)
+					self.player.vel = vec(0, 0)
 			
 			else: 
 				self.isplaying = False
@@ -640,7 +675,8 @@ class Game:
 			self.get_events_title()
 
 			# color the background 
-			Game.WIN.fill((178, 39, 155))
+			#Game.WIN.fill((178, 39, 155))
+			Game.WIN.blit(self.assets["start"], [0, 0])
 
 			# set text for main screen
 			self.draw_text(Game.WIN, "pixFighter", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7, 80)
@@ -687,7 +723,9 @@ class Game:
 				if self.state == State.LVL1: 
 					# create platforms for this level
 					platform2 = Platform(150, 250, 25, 150) 
-					platform3 = Platform(450, 200, 25, 150)
+					platform3 = Platform(450, 200, 25, 150) 
+
+					# adds platforms to group
 					self.platforms.add(platform2)
 					self.platforms.add(platform3)
 
@@ -701,13 +739,19 @@ class Game:
 					self.create_bandits(1, 100, (2, 4), 1)
 					self.main()
 				elif self.state == State.LVL2: 
-					self.isplaying = True
-					
+					self.isplaying = True 
+
+					# create bandits and run level
 					self.create_bandits(2, 100, (2, 5), 1.2)
 					self.main()
 				elif self.state == State.LVL3:
 					self.isplaying = True 
 
+					# create a portal
+					portal1 = Portal(450, 180)
+					self.portals.add(portal1)
+
+					# create bandits and run level
 					self.create_bandits(3, 100, (2, 5), 1.2)
 					self.main()
 				elif self.state == State.LVL4: 
@@ -717,12 +761,19 @@ class Game:
 
 					# create platforms for this level
 					platform4 = Platform(100, 200, 25, 150) 
-					platform5 = Platform(590, 220, 25, 150)
+					platform5 = Platform(590, 220, 25, 150) 
+
+					# add platforms to group
 					self.platforms.add(platform4)
-					self.platforms.add(platform5)
+					self.platforms.add(platform5) 
+
+					# player falls
+					self.player.pos = vec(70, 100)
+					self.player.vel = vec(0, 0)
 
 					self.isplaying = True
 
+					# create bandits and run level
 					self.create_bandits(2, 100, (2, 3), 1.2)
 					self.create_bandits(2, 150, (2, 5), 1.3, False)
 					self.main() 
@@ -733,19 +784,28 @@ class Game:
 
 					self.isplaying = True
 
+					# create bandits and run level
 					self.create_bandits(2, 100, (2, 4), 1.2)
 					self.create_bandits(3, 200, (2, 5), 1.3, False)
 					self.main()
 				elif self.state == State.LVL6:  
+					# removes health from group
 					self.healths.remove(hl1)
+
 					self.isplaying = True
 
+					# create bandits and run level
 					self.create_bandits(3, 100, (2, 4), 1.2)
 					self.create_bandits(3, 200, (2, 5), 1.3, False)
 					self.main()
 				elif self.state == State.LVL7: 
-					self.isplaying = True
+					self.isplaying = True 
 
+					# create a portal
+					portal2 = Portal(590, 200)
+					self.portals.add(portal2)
+
+					# create bandits and run level
 					self.create_bandits(2, 100, (2, 5), 1.2)
 					self.create_bandits(5, 200, (3, 5), 1.3, False)
 					self.main()
@@ -762,17 +822,25 @@ class Game:
 					platform6 = Platform(200, 180, 25, 150) 
 					platform7 = Platform(590, 220, 25, 150)
 					self.platforms.add(platform6)
-					self.platforms.add(platform7)
+					self.platforms.add(platform7) 
+
+					# player falls
+					self.player.pos = vec(70, 100)
+					self.player.vel = vec(0, 0)
 
 					self.isplaying = True
 
+					# create bandits and run level
 					self.create_bandits(2, 100, (2, 5), 1.2)
 					self.create_bandits(6, 200, (3, 6), 1.3, False)
 					self.main()
 				elif self.state == State.LVL9: 
-					self.healths.remove(hl2)
+					# removes healths from group
+					self.healths.remove(hl2) 
+
 					self.isplaying = True
 
+					# create bandits and run level
 					self.create_bandits(2, 100, (2, 5), 1.2)
 					self.create_bandits(7, 200, (3, 6), 1.4, False)
 					self.main()
@@ -783,13 +851,16 @@ class Game:
 
 					self.isplaying = True
 
+					# create bandits and run level
 					self.create_bandits(4, 100, (2, 5), 1.4)
 					self.create_bandits(6, 200, (3, 7), 1.7, False)
 					self.main()
 				elif self.state == State.LVL11: 
+					# remove health from group
 					self.healths.remove(hl1)
 					self.isplaying = True
 
+					# create bandits and run level
 					self.create_bandits(11, 200, (3, 7), 1.7, False)
 					self.main() 
 				elif self.state == State.GAME_OVER: 
