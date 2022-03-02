@@ -71,4 +71,4 @@ class Sounds:
         pygame.init()
         music = pygame.mixer.music.load("./sounds/music/Background_song.mp3")
         pygame.mixer.music.play()
-        pygame.mixer.music.set_volume(0.2)
+        pygame.mixer.music.set_volume(0.05)

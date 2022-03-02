@@ -75,6 +75,7 @@ class Game:
 
 		# declare player
 		self.player = Player(70, 100, "Player", 100)
+		self.pl_vl = 0
 
 		# list of bandits 
 		self.bandits = [] 
@@ -103,6 +104,9 @@ class Game:
 
 		# boolean win
 		self.finish = False 
+
+		# boolean for help
+		self.help = False
 
 		# buttons
 		self.back = Button(780, 20, 'Back') 
@@ -249,6 +253,7 @@ class Game:
 			Game.WIN.blit(self.assets["lvl1_floorPL"], [150, 240])
 			Game.WIN.blit(self.assets["lvl1_floorPL"], [450, 190]) 
 
+			# create portal
 			if self.current_level == 3 and len(self.bandits) == 0:
 				Game.WIN.blit(self.assets["portal"], [450, 170])
 
@@ -260,9 +265,11 @@ class Game:
 			Game.WIN.blit(self.assets["lvl2_floorPL"], [100, 195])
 			Game.WIN.blit(self.assets["lvl2_floorPL"], [590, 215]) 
 
+			# add sprite for health
 			if self.current_level == 5 and len(self.healths) != 0: 
 				Game.WIN.blit(self.assets["health"], [620, 275]) 
 
+			# create portal
 			if self.current_level == 7 and len(self.bandits) == 0:
 				Game.WIN.blit(self.assets["portal"], [590, 200])
 
@@ -272,9 +279,11 @@ class Game:
 			Game.WIN.blit(self.assets["lvl3_floorPL"], [590, 315])
 			Game.WIN.blit(self.assets["lvl3_floorPL"], [200, 275]) 
 
+			# add sprite for health
 			if self.current_level == 8 and len(self.healths) != 0: 
 				Game.WIN.blit(self.assets["health"], [230, 240]) 
 
+			# create portal
 			if self.current_level == 10 and len(self.healths) != 0: 
 				Game.WIN.blit(self.assets["health"], [620, 280]) 
 
@@ -309,33 +318,28 @@ class Game:
 		Method, that draws health of a player on the screen
 		""" 
 		font = pygame.font.Font('freesansbold.ttf', 20)
-		health = font.render(f'Health: {round(self.player.hp, 0)}', True, [255, 255, 255],None) 
+		font2 = pygame.font.Font('freesansbold.ttf', 30)
+		health = font2.render(f'Health: {round(self.player.hp, 0)}', True, [255, 255, 255],None) 
 		points = font.render(f'Points: {round(self.player.points, 0)}', True, [255, 255, 255],None) 
 		highscore = font.render(f'Highscore: {round(self.highscore, 0)}', True, [255, 255, 255],None) 
-
-		# movement 
-		movement = font.render("Movement: arrows", True, [255, 255, 255],None) 
-		attack = font.render("Attack: k", True, [255, 255, 255],None)
+		hlp = font.render('Press h for help', True, [255, 255, 255],None) 
 
 		textRect = health.get_rect() 
 		pointsRect = points.get_rect() 
 		highscoreRect = highscore.get_rect() 
-		movementRect = movement.get_rect() 
-		attackRect = attack.get_rect()
+		hlpRect = hlp.get_rect() 
 
 		# set coordinates
-		textRect.center = (100, 50) 
-		pointsRect.center = (100, 80) 
-		highscoreRect.center = (100, 110) 
-		movementRect.center = (100, 170)
-		attackRect.center = (100, 200)
+		textRect.center = (450, 30) 
+		pointsRect.center = (70, 40) 
+		highscoreRect.center = (100, 70) 
+		hlpRect.center = (810, 120)
 
 		# draw on screen
 		Game.WIN.blit(health, textRect)
 		Game.WIN.blit(points, pointsRect)  
 		Game.WIN.blit(highscore, highscoreRect) 
-		Game.WIN.blit(movement, movementRect) 
-		Game.WIN.blit(attack, attackRect)
+		Game.WIN.blit(hlp, hlpRect) 
 
 
 	def draw_text(self, surface, text, color, x, y, font_size): 
@@ -384,7 +388,17 @@ class Game:
 				# back to TITLE state
 				self.game_over = False 
 				self.isplaying = False 
-				self.end.clicked = False
+				self.end.clicked = False 
+
+				# player data
+				self.player.pos = vec(70, 100) 
+				self.player.acc = vec(0, 0) 
+				self.player.index = 0 
+				self.animation_action = "idle" 
+
+				# platforms
+				self.platforms.empty()
+				self.platforms.add(Platform(0, 380, Game.WIDTH, 40))
 				self.state = State.TITLE 
 
 
@@ -431,6 +445,7 @@ class Game:
 
 		# inside this for loop we check for different events that occur in pygame
 		for event in pygame.event.get(): 
+			self.pl_vl = 0
 			
 			# if we click x the game quits
 			if event.type == pygame.QUIT: 
@@ -441,24 +456,34 @@ class Game:
 				
 				# move left 
 				if event.key == pygame.K_LEFT or event.key == ord('a'):
-					self.player.index = 0
-					self.player.control_position(-7)
+					self.player.index = 0 
+
+					# needed for event handling
+					if self.pl_vl == 0:
+						self.pl_vl = -7
+					
+					self.player.control_position(self.pl_vl)
 					self.player.vl = -0.12
 					self.animation_action = "run"
 					self.animation_cooldown = 150
 					self.flip = True
 
 				# move right
-				if event.key == pygame.K_RIGHT or event.key == ord('d'):
+				elif event.key == pygame.K_RIGHT or event.key == ord('d'): 
 					self.player.index = 0
-					self.player.control_position(7)
+
+					# needed for event handling
+					if self.pl_vl == 0:
+						self.pl_vl = 7
+					
+					self.player.control_position(self.pl_vl)
 					self.player.vl = -0.12
 					self.animation_action = "run" 
 					self.animation_cooldown = 150
 					self.flip = False 
 
 				# jump
-				if event.key == pygame.K_UP or event.key == ord('w'): 
+				elif event.key == pygame.K_UP or event.key == ord('w'): 
 					self.sounds.jump_sound()
 					self.player.index = 0
 					self.player.is_jumping = True
@@ -466,26 +491,46 @@ class Game:
 					self.animation_cooldown = 250
 
 				# attack
-				if event.key == ord('k'):
+				elif event.key == ord('k'):
 					self.animation_action = "attack" 
 					self.animation_cooldown = 90 
 					self.player.attack(self.bandits)
-					self.sounds.hit_sound()
+					self.sounds.hit_sound() 
 
-			else:
-				if event.type == pygame.KEYUP:
-					
-					# on key ups stop player movement 
-					if event.key == pygame.K_LEFT or event.key == ord('a'):
-						self.player.control_position(7)
-						self.player.vl = 0
+				# help
+				elif event.key == ord('h'):
+					self.help = True
 
-					if event.key == pygame.K_RIGHT or event.key == ord('d'):
-						self.player.control_position(-7)
-						self.player.vl = 0
+		
+			if event.type == pygame.KEYUP:
+				
+				# on key ups stop player movement 
+				if event.key == pygame.K_LEFT or event.key == ord('a'):
+					# needed for event handling
+					if self.pl_vl == -7:
+						self.pl_vl = -7
+					else:
+						self.pl_vl = 7
 
-					if event.key == ord('k'):
-						self.animation_cooldown = 200 
+					self.player.control_position(self.pl_vl)
+					self.player.vl = 0
+
+				elif event.key == pygame.K_RIGHT or event.key == ord('d'): 
+					# needed for event handling
+					if self.pl_vl == 7:
+						self.pl_vl = 7
+					else:
+						self.pl_vl = -7
+						
+					self.player.control_position(self.pl_vl)
+					self.player.vl = 0
+
+				elif event.key == ord('k'):
+					self.animation_cooldown = 200 
+
+				# help
+				elif event.key == ord('h'):
+					self.help = False
 
 				# check if any key on a keyboard is pressed, to set sprite movement to idle
 				keys = pygame.key.get_pressed() 
@@ -493,6 +538,7 @@ class Game:
 				if True not in keys:
 					self.player.index = 0 
 					self.animation_action = "idle" 
+			self.pl_vl = 0
 
 
 	def get_events_title(self):
@@ -579,9 +625,12 @@ class Game:
 	def main(self): 
 		"""
 		Main playing method
-		"""
+		""" 
 
-		pygame.event.clear()
+		self.player.vel = vec(0, 0)
+		#self.player.acc = vec(0, 0)
+		self.player.index = 0 
+		self.animation_action = "idle"
 
 		while self.isplaying: 
 
@@ -612,12 +661,10 @@ class Game:
 						self.player.points = 0 
 						self.player.extra_p = 300
 						self.player.pos = vec(70, 100)
-						self.player.vel = vec(0, 0)
 
 					# check if player is_jumping boolean is True
 					if self.player.is_jumping:
 						self.player.jumping() 
-
 
 					# check for platforms (jump only if the player is falling)
 					if self.player.vel.y > 0:
@@ -650,7 +697,13 @@ class Game:
 					self.draw_bandit(self.player)  
 
 					# draws data of a player 
-					self.draw_player_data()
+					self.draw_player_data() 
+
+					# draw help
+					if self.help:
+						self.draw_text(Game.WIN, "Help:", [255, 255, 255], 850, 370, 23)
+						self.draw_text(Game.WIN, "Movement: arrows", [255, 255, 255], 793, 410, 20)
+						self.draw_text(Game.WIN, "Attack: k", [255, 255, 255], 840, 440, 20)
 
 					# updates display
 					pygame.display.update() 
@@ -661,7 +714,6 @@ class Game:
 					self.isplaying = False
 
 					self.player.pos = vec(70, 100)
-					self.player.vel = vec(0, 0)
 
 					self.platforms.empty()
 					self.platforms.add(Platform(0, 380, Game.WIDTH, 40))
@@ -684,21 +736,20 @@ class Game:
 			# event manager function
 			self.get_events_title()
 
-			# color the background 
-			#Game.WIN.fill((178, 39, 155))
+			# background image
 			Game.WIN.blit(self.assets["start"], [0, 0])
 
 			# set text for main screen
 			self.draw_text(Game.WIN, "pixFighter", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7, 80)
 
-			self.draw_text(Game.WIN, Game.INTRO_TEXT1, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 100, 20) 
-			self.draw_text(Game.WIN, Game.INTRO_TEXT2, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 140, 20)
-			self.draw_text(Game.WIN, Game.INTRO_TEXT3, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 180, 20) 
-			self.draw_text(Game.WIN, Game.INTRO_TEXT4, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 220, 20) 
-			self.draw_text(Game.WIN, Game.INTRO_TEXT5, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 260, 20) 
-			self.draw_text(Game.WIN, Game.INTRO_TEXT6, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 300, 20)
+			self.draw_text(Game.WIN, Game.INTRO_TEXT1, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 80, 20) 
+			self.draw_text(Game.WIN, Game.INTRO_TEXT2, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 120, 20)
+			self.draw_text(Game.WIN, Game.INTRO_TEXT3, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 160, 20) 
+			self.draw_text(Game.WIN, Game.INTRO_TEXT4, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 200, 20) 
+			self.draw_text(Game.WIN, Game.INTRO_TEXT5, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 240, 20) 
+			self.draw_text(Game.WIN, Game.INTRO_TEXT6, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 280, 20)
 
-			self.draw_text(Game.WIN, "Press enter to start the game", [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/2) + 200, 20)
+			self.draw_text(Game.WIN, "Press enter to start the game", [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/2) + 220, 20)
 
 			# updates display
 			pygame.display.update()
@@ -742,27 +793,28 @@ class Game:
 					# set data
 					self.player.start_time = time.time()
 					self.player.extra_p = 300
-					self.player.points = 0
-					self.isplaying = True 
+					self.player.points = 0 
 
 					# create bandits and run level
 					self.create_bandits(1, 100, (2, 4), 1)
+
+					self.isplaying = True
 					self.main()
 				elif self.state == State.LVL2: 
-					self.isplaying = True 
-
 					# create bandits and run level
-					self.create_bandits(2, 100, (2, 5), 1.2)
-					self.main()
-				elif self.state == State.LVL3:
-					self.isplaying = True 
+					self.create_bandits(2, 100, (2, 5), 1.2) 
 
+					self.isplaying = True
+					self.main()
+				elif self.state == State.LVL3: 
 					# create a portal
 					portal1 = Portal(450, 180)
 					self.portals.add(portal1)
 
 					# create bandits and run level
-					self.create_bandits(3, 100, (2, 5), 1.2)
+					self.create_bandits(3, 100, (2, 5), 1.2) 
+
+					self.isplaying = True 
 					self.main()
 				elif self.state == State.LVL4: 
 					# remove old platforms
@@ -775,42 +827,39 @@ class Game:
 
 					# add platforms to group
 					self.platforms.add(platform4)
-					self.platforms.add(platform5) 
+					self.platforms.add(platform5)  
 
 					# player falls
 					self.player.pos = vec(70, 100)
-					self.player.vel = vec(0, 0)
-
-					self.isplaying = True
 
 					# create bandits and run level
 					self.create_bandits(2, 100, (2, 3), 1.2)
 					self.create_bandits(2, 150, (2, 5), 1.3, False)
+
+					self.isplaying = True
 					self.main() 
 				elif self.state == State.LVL5: 
 					# add health 
 					hl1 = Health(620, 215)
 					self.healths.add(hl1)
 
-					self.isplaying = True
-
 					# create bandits and run level
 					self.create_bandits(2, 100, (2, 4), 1.2)
 					self.create_bandits(3, 200, (2, 5), 1.3, False)
-					self.main()
-				elif self.state == State.LVL6:  
-					# removes health from group
-					self.healths.remove(hl1)
 
 					self.isplaying = True
+					self.main()
+				elif self.state == State.LVL6: 
+					# removes health from group
+					self.healths.remove(hl1)
 
 					# create bandits and run level
 					self.create_bandits(3, 100, (2, 4), 1.2)
 					self.create_bandits(3, 200, (2, 5), 1.3, False)
+
+					self.isplaying = True
 					self.main()
 				elif self.state == State.LVL7: 
-					self.isplaying = True 
-
 					# create a portal
 					portal2 = Portal(590, 200)
 					self.portals.add(portal2)
@@ -818,6 +867,8 @@ class Game:
 					# create bandits and run level
 					self.create_bandits(2, 100, (2, 5), 1.2)
 					self.create_bandits(5, 200, (3, 5), 1.3, False)
+
+					self.isplaying = True 
 					self.main()
 				elif self.state == State.LVL8: 
 					# add health 
@@ -836,42 +887,42 @@ class Game:
 
 					# player falls
 					self.player.pos = vec(70, 100)
-					self.player.vel = vec(0, 0)
-
-					self.isplaying = True
 
 					# create bandits and run level
 					self.create_bandits(2, 100, (2, 5), 1.2)
 					self.create_bandits(6, 200, (3, 6), 1.3, False)
+
+					self.isplaying = True
 					self.main()
 				elif self.state == State.LVL9: 
 					# removes healths from group
 					self.healths.remove(hl2) 
 
-					self.isplaying = True
-
 					# create bandits and run level
 					self.create_bandits(2, 100, (2, 5), 1.2)
 					self.create_bandits(7, 200, (3, 6), 1.4, False)
+
+					self.isplaying = True
 					self.main()
 				elif self.state == State.LVL10: 
 					# add health 
 					hl3 = Health(620, 220)
 					self.healths.add(hl3)
 
-					self.isplaying = True
-
 					# create bandits and run level
 					self.create_bandits(4, 100, (2, 5), 1.4)
 					self.create_bandits(6, 200, (3, 7), 1.7, False)
+
+					self.isplaying = True
 					self.main()
 				elif self.state == State.LVL11: 
 					# remove health from group
 					self.healths.remove(hl1)
-					self.isplaying = True
 
 					# create bandits and run level
 					self.create_bandits(11, 200, (3, 7), 1.7, False)
+
+					self.isplaying = True
 					self.main() 
 				elif self.state == State.GAME_OVER: 
 					self.write_hs()

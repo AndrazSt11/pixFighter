@@ -116,6 +116,7 @@ class Player(pygame.sprite.Sprite):
 		""" 
 		self.acc.y = 2.5
 		self.pos = physics.update_movement(self.pos, self.vel, self.acc) 
+		self.acc.y = 0
 
 		# wrap aroung the sides of the screen
 		if self.pos.x > WIDTH: 
