@@ -2,9 +2,13 @@ import pygame
 import math
 import random
 from Sounds import Sounds 
+from Physics import Physics
 
 # vector 
 vec = pygame.math.Vector2
+
+# physics
+physics = Physics()
 
 class Bandit: 
 	def __init__(self, x, y, hp, speed, power, is_light): 
@@ -18,18 +22,22 @@ class Bandit:
 		:param is_light: boolean for changing between light and heavy bandit sprites
 		""" 
 		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.Surface((10, 15))
+		self.rect = self.image.get_rect()
+		self.rect.center = (x, y)
 
 		# bandit data
 		self.pos = vec(x, y)
-		self.moveX = 0
-		self.moveY = 0
+		self.vel = vec(0, 0) # velocity for moving
+		self.acc = vec(0, 0) # acceloration of player
 		self.hp = hp
 		self.alive = True 
 		self.power = power
+		self.velocity = random.randint(speed[0], speed[1]) # create a bandit with random speed of running
 
 		# bandit jumping
 		self.is_jumping = False
-		self.velocity = random.randint(speed[0], speed[1]) # create a bandit with random speed of running
+		self.vle = 12
 		self.mass = 1
 
 		# animation
@@ -123,10 +131,11 @@ class Bandit:
 			self.index = 0 
 
 
-	def move_towards_player(self, player):
+	def move_towards_player(self, player, WIDTH):
 		"""
 		Move bandit towards player
 		:param player: a player that bandits are moving towards
+		:param WIDTH: width of a game window
 		""" 
 
 		# direction vector between player and bandit
@@ -136,10 +145,48 @@ class Bandit:
 		# check if bandit and player are 0 distance away
 		if dist != 0:
 			# normalize
-			dx, dy = dx / dist, dy / dist
+			#dx, dy = dx / dist, dy / dist 
+
+			self.acc.y = 2.5
+			self.pos = physics.update_movement(self.pos, self.vel, self.acc) 
+			self.acc.y = 0
+
+			# wrap aroung the sides of the screen
+			if self.pos.x > WIDTH: 
+				self.pos.x = -50
+			if self.pos.x < -50: 
+				self.pos.x = WIDTH
+
+			self.rect.midbottom = self.pos
 
 		# move towards player at current speed
-		self.pos.x += dx * self.velocity 
+		#self.pos.x += dx * self.velocity 
+
+
+	def jumping(self): 
+		"""
+		Calculating jump
+		"""
+		# calculate force
+		self.vle = 12
+		force = (1 / 2)*self.mass*(self.vle**2)
+
+		# change y coordinate
+		self.pos.y -= force
+		self.rect.y -= force
+		self.vle = self.vle - 1
+
+		# if object has reached maximum height
+		if self.vle < 0:
+			self.mass =-1
+
+		# if object reaches its original state
+		if self.vle ==-13:
+			
+			# set the jumping boolean to False 
+			self.is_jumping = False
+			self.vle = 12
+			self.mass = 1 
 		
 
 	def attack_player(self, player): 

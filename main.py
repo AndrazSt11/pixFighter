@@ -7,6 +7,7 @@ from Bandit import Bandit
 from Sounds import Sounds 
 from Platform import Platform
 from Portal import Portal
+from Physics import Physics
 from Health import Health
 from Button import Button
 
@@ -15,6 +16,9 @@ from os import path
 
 # vector
 vec = pygame.math.Vector2
+
+# physics
+physics = Physics()
 
 class State(Enum): 
 	"""
@@ -460,7 +464,7 @@ class Game:
 
 					# needed for event handling
 					if self.pl_vl == 0:
-						self.pl_vl = -7
+						self.pl_vl = -8
 					
 					self.player.control_position(self.pl_vl)
 					self.player.vl = -0.12
@@ -474,7 +478,7 @@ class Game:
 
 					# needed for event handling
 					if self.pl_vl == 0:
-						self.pl_vl = 7
+						self.pl_vl = 8
 					
 					self.player.control_position(self.pl_vl)
 					self.player.vl = -0.12
@@ -507,20 +511,20 @@ class Game:
 				# on key ups stop player movement 
 				if event.key == pygame.K_LEFT or event.key == ord('a'):
 					# needed for event handling
-					if self.pl_vl == -7:
-						self.pl_vl = -7
+					if self.pl_vl == -8:
+						self.pl_vl = -8
 					else:
-						self.pl_vl = 7
+						self.pl_vl = 8
 
 					self.player.control_position(self.pl_vl)
 					self.player.vl = 0
 
 				elif event.key == pygame.K_RIGHT or event.key == ord('d'): 
 					# needed for event handling
-					if self.pl_vl == 7:
-						self.pl_vl = 7
+					if self.pl_vl == 8:
+						self.pl_vl = 8
 					else:
-						self.pl_vl = -7
+						self.pl_vl = -8
 						
 					self.player.control_position(self.pl_vl)
 					self.player.vl = 0
@@ -574,7 +578,16 @@ class Game:
 		for bandit in self.bandits: 
 			# move bandits until they reach the player
 			if not (bandit.pos.x <= (self.player.pos.x + 30) and bandit.pos.x >= self.player.pos.x - 30):
-				bandit.move_towards_player(self.player) 
+				dx, dy = self.player.pos.x - bandit.pos.x, self.player.pos.y - bandit.pos.y
+				if dx > 0:
+					bandit.acc = vec(bandit.velocity, 0)
+				else:
+					bandit.acc = bandit.acc = vec(-bandit.velocity, 0)
+
+				bandit.move_towards_player(self.player, Game.WIDTH) 
+			else:
+				if not (bandit.pos.y <= self.player.pos.y + 50): 
+					bandit.jumping()
 
 			# check if bandit is dead
 			if bandit.hp <= 0: 
@@ -672,6 +685,13 @@ class Game:
 						if hits:
 							self.player.pos.y = hits[0].rect.top
 							self.player.vel.y = 0 
+
+					for bandit in self.bandits:
+						if bandit.vel.y > 0:
+							hits = pygame.sprite.spritecollide(bandit, self.platforms, False)
+							if hits:
+								bandit.pos.y = hits[0].rect.top
+								bandit.vel.y = 0 
 
 					# check if player gets health and update it
 					hits = pygame.sprite.spritecollide(self.player, self.healths, True)
@@ -834,7 +854,7 @@ class Game:
 
 					# create bandits and run level
 					self.create_bandits(2, 100, (2, 3), 1.2)
-					self.create_bandits(2, 150, (2, 5), 1.3, False)
+					self.create_bandits(2, 150, (3, 7), 1.3, False)
 
 					self.isplaying = True
 					self.main() 
@@ -845,7 +865,7 @@ class Game:
 
 					# create bandits and run level
 					self.create_bandits(2, 100, (2, 4), 1.2)
-					self.create_bandits(3, 200, (2, 5), 1.3, False)
+					self.create_bandits(3, 200, (3, 7), 1.3, False)
 
 					self.isplaying = True
 					self.main()
@@ -855,7 +875,7 @@ class Game:
 
 					# create bandits and run level
 					self.create_bandits(3, 100, (2, 4), 1.2)
-					self.create_bandits(3, 200, (2, 5), 1.3, False)
+					self.create_bandits(3, 200, (3, 7), 1.4, False)
 
 					self.isplaying = True
 					self.main()
@@ -866,7 +886,7 @@ class Game:
 
 					# create bandits and run level
 					self.create_bandits(2, 100, (2, 5), 1.2)
-					self.create_bandits(5, 200, (3, 5), 1.3, False)
+					self.create_bandits(5, 200, (3, 8), 1.4, False)
 
 					self.isplaying = True 
 					self.main()
@@ -890,7 +910,7 @@ class Game:
 
 					# create bandits and run level
 					self.create_bandits(2, 100, (2, 5), 1.2)
-					self.create_bandits(6, 200, (3, 6), 1.3, False)
+					self.create_bandits(6, 200, (3, 6), 1.5, False)
 
 					self.isplaying = True
 					self.main()
@@ -900,7 +920,7 @@ class Game:
 
 					# create bandits and run level
 					self.create_bandits(2, 100, (2, 5), 1.2)
-					self.create_bandits(7, 200, (3, 6), 1.4, False)
+					self.create_bandits(7, 200, (3, 6), 1.5, False)
 
 					self.isplaying = True
 					self.main()
@@ -911,7 +931,7 @@ class Game:
 
 					# create bandits and run level
 					self.create_bandits(4, 100, (2, 5), 1.4)
-					self.create_bandits(6, 200, (3, 7), 1.7, False)
+					self.create_bandits(6, 200, (3, 6), 2, False)
 
 					self.isplaying = True
 					self.main()
@@ -920,7 +940,7 @@ class Game:
 					self.healths.remove(hl1)
 
 					# create bandits and run level
-					self.create_bandits(11, 200, (3, 7), 1.7, False)
+					self.create_bandits(11, 200, (3, 6), 2, False)
 
 					self.isplaying = True
 					self.main() 

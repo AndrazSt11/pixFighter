@@ -21,7 +21,7 @@ class Player(pygame.sprite.Sprite):
 
 		# needed for sprite colision
 		pygame.sprite.Sprite.__init__(self)
-		self.image = pygame.Surface((10, 15))
+		self.image = pygame.Surface((10, 30))
 		self.rect = self.image.get_rect()
 		self.rect.center = (x, y)
 
