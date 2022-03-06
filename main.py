@@ -477,7 +477,7 @@ class Game:
 					self.player.index = 0
 
 					# needed for event handling
-					if self.pl_vl == 0:
+					if self.pl_vl == 0: 
 						self.pl_vl = 8
 					
 					self.player.control_position(self.pl_vl)
@@ -576,16 +576,18 @@ class Game:
 		Method for updating bandits
 		"""
 		for bandit in self.bandits: 
-			# move bandits until they reach the player
 			if not (bandit.pos.x <= (self.player.pos.x + 30) and bandit.pos.x >= self.player.pos.x - 30):
 				dx, dy = self.player.pos.x - bandit.pos.x, self.player.pos.y - bandit.pos.y
+				# check for direction of player
 				if dx > 0:
 					bandit.acc = vec(bandit.velocity, 0)
 				else:
 					bandit.acc = bandit.acc = vec(-bandit.velocity, 0)
 
+				# move bandits until they reach the player
 				bandit.move_towards_player(self.player, Game.WIDTH) 
 			else:
+				# bandits jump if player is on platform
 				if not (bandit.pos.y <= self.player.pos.y + 50): 
 					bandit.jumping()
 
@@ -767,7 +769,9 @@ class Game:
 			self.draw_text(Game.WIN, Game.INTRO_TEXT3, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 160, 20) 
 			self.draw_text(Game.WIN, Game.INTRO_TEXT4, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 200, 20) 
 			self.draw_text(Game.WIN, Game.INTRO_TEXT5, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 240, 20) 
-			self.draw_text(Game.WIN, Game.INTRO_TEXT6, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 280, 20)
+			self.draw_text(Game.WIN, Game.INTRO_TEXT6, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 280, 20) 
+
+			self.draw_text(Game.WIN, "Arrows: move, K: attack", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 340, 25)
 
 			self.draw_text(Game.WIN, "Press enter to start the game", [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/2) + 220, 20)
 
@@ -822,7 +826,7 @@ class Game:
 					self.main()
 				elif self.state == State.LVL2: 
 					# create bandits and run level
-					self.create_bandits(2, 100, (2, 5), 1.2) 
+					self.create_bandits(2, 100, (2, 5), 1) 
 
 					self.isplaying = True
 					self.main()
@@ -832,7 +836,7 @@ class Game:
 					self.portals.add(portal1)
 
 					# create bandits and run level
-					self.create_bandits(3, 100, (2, 5), 1.2) 
+					self.create_bandits(3, 100, (2, 5), 1) 
 
 					self.isplaying = True 
 					self.main()
@@ -853,8 +857,8 @@ class Game:
 					self.player.pos = vec(70, 100)
 
 					# create bandits and run level
-					self.create_bandits(2, 100, (2, 3), 1.2)
-					self.create_bandits(2, 150, (3, 7), 1.3, False)
+					self.create_bandits(2, 100, (2, 3), 1)
+					self.create_bandits(2, 150, (3, 7), 1.2, False)
 
 					self.isplaying = True
 					self.main() 
@@ -864,8 +868,8 @@ class Game:
 					self.healths.add(hl1)
 
 					# create bandits and run level
-					self.create_bandits(2, 100, (2, 4), 1.2)
-					self.create_bandits(3, 200, (3, 7), 1.3, False)
+					self.create_bandits(2, 100, (2, 4), 1)
+					self.create_bandits(3, 200, (3, 7), 1.2, False)
 
 					self.isplaying = True
 					self.main()
@@ -874,8 +878,8 @@ class Game:
 					self.healths.remove(hl1)
 
 					# create bandits and run level
-					self.create_bandits(3, 100, (2, 4), 1.2)
-					self.create_bandits(3, 200, (3, 7), 1.4, False)
+					self.create_bandits(3, 100, (2, 4), 1)
+					self.create_bandits(3, 200, (3, 7), 1.2, False)
 
 					self.isplaying = True
 					self.main()
@@ -885,8 +889,8 @@ class Game:
 					self.portals.add(portal2)
 
 					# create bandits and run level
-					self.create_bandits(2, 100, (2, 5), 1.2)
-					self.create_bandits(5, 200, (3, 8), 1.4, False)
+					self.create_bandits(2, 100, (2, 5), 1)
+					self.create_bandits(5, 200, (3, 8), 1.2, False)
 
 					self.isplaying = True 
 					self.main()
@@ -910,7 +914,7 @@ class Game:
 
 					# create bandits and run level
 					self.create_bandits(2, 100, (2, 5), 1.2)
-					self.create_bandits(6, 200, (3, 6), 1.5, False)
+					self.create_bandits(6, 200, (3, 6), 1.3, False)
 
 					self.isplaying = True
 					self.main()
@@ -920,7 +924,7 @@ class Game:
 
 					# create bandits and run level
 					self.create_bandits(2, 100, (2, 5), 1.2)
-					self.create_bandits(7, 200, (3, 6), 1.5, False)
+					self.create_bandits(7, 200, (3, 6), 1.3, False)
 
 					self.isplaying = True
 					self.main()
@@ -930,8 +934,8 @@ class Game:
 					self.healths.add(hl3)
 
 					# create bandits and run level
-					self.create_bandits(4, 100, (2, 5), 1.4)
-					self.create_bandits(6, 200, (3, 6), 2, False)
+					self.create_bandits(4, 100, (2, 5), 1.3)
+					self.create_bandits(6, 200, (3, 6), 1.6, False)
 
 					self.isplaying = True
 					self.main()
