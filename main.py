@@ -848,8 +848,8 @@ class Game:
 					self.healths.add(hl1)
 
 					# create bandits and run level
-					self.create_bandits(2, 100, (2, 4), 1)
-					self.create_bandits(3, 200, (3, 7), 1.2, False)
+					self.create_bandits(2, 100, (2, 4), 1.2)
+					self.create_bandits(3, 200, (3, 7), 1.3, False)
 
 					self.isplaying = True
 					self.main()
@@ -858,8 +858,8 @@ class Game:
 					self.healths.remove(hl1)
 
 					# create bandits and run level
-					self.create_bandits(3, 100, (2, 4), 1)
-					self.create_bandits(3, 200, (3, 7), 1.2, False)
+					self.create_bandits(3, 100, (2, 4), 1.2)
+					self.create_bandits(3, 200, (3, 7), 1.3, False)
 
 					self.isplaying = True
 					self.main()
@@ -869,8 +869,8 @@ class Game:
 					self.portals.add(portal2)
 
 					# create bandits and run level
-					self.create_bandits(2, 100, (2, 5), 1)
-					self.create_bandits(5, 200, (3, 8), 1.2, False)
+					self.create_bandits(2, 100, (2, 5), 1.2)
+					self.create_bandits(5, 200, (3, 8), 1.3, False)
 
 					self.isplaying = True 
 					self.main()
@@ -903,8 +903,8 @@ class Game:
 					self.healths.remove(hl2) 
 
 					# create bandits and run level
-					self.create_bandits(2, 100, (2, 5), 1.2)
-					self.create_bandits(7, 200, (3, 6), 1.3, False)
+					self.create_bandits(2, 100, (2, 5), 1.4)
+					self.create_bandits(7, 200, (3, 6), 1.5, False)
 
 					self.isplaying = True
 					self.main()
@@ -914,7 +914,7 @@ class Game:
 					self.healths.add(hl3)
 
 					# create bandits and run level
-					self.create_bandits(4, 100, (2, 5), 1.3)
+					self.create_bandits(4, 100, (2, 5), 1.4)
 					self.create_bandits(6, 200, (3, 6), 1.6, False)
 
 					self.isplaying = True
