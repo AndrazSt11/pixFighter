@@ -783,6 +783,8 @@ class Game:
 				self.back.clicked = False 
 				self.bandits = []
 				self.main_title()
+				self.pl_vl = 0
+				self.player.acc = vec(0, 0)
 			# level states
 			else:
 				if self.state == State.LVL1: 
