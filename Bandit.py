@@ -36,7 +36,6 @@ class Bandit:
 		self.velocity = random.randint(speed[0], speed[1]) # create a bandit with random speed of running
 
 		# bandit jumping
-		self.is_jumping = False
 		self.vle = 12
 		self.mass = 1
 
@@ -144,8 +143,6 @@ class Bandit:
 
 		# check if bandit and player are 0 distance away
 		if dist != 0:
-			# normalize
-			#dx, dy = dx / dist, dy / dist 
 
 			self.acc.y = 2.5
 			self.pos = physics.update_movement(self.pos, self.vel, self.acc) 
@@ -158,9 +155,6 @@ class Bandit:
 				self.pos.x = WIDTH
 
 			self.rect.midbottom = self.pos
-
-		# move towards player at current speed
-		#self.pos.x += dx * self.velocity 
 
 
 	def jumping(self): 
@@ -184,7 +178,6 @@ class Bandit:
 		if self.vle ==-13:
 			
 			# set the jumping boolean to False 
-			self.is_jumping = False
 			self.vle = 12
 			self.mass = 1 
 		

@@ -53,8 +53,8 @@ class Game:
 
 	# intro text
 	INTRO_TEXT1 = "You've found yourself in a strange place called Emiphia."
-	INTRO_TEXT2 = "No foreigners are allowed, so everyone that sees you is attacking you,"
-	INTRO_TEXT3 = "so you have to fight back if you want to survive." 
+	INTRO_TEXT2 = "No foreigners are allowed, so everyone that sees you is attacking you."
+	INTRO_TEXT3 = "You have to fight back if you want to survive!" 
 	INTRO_TEXT4 = "But remember, you'll have to be very careful! The enemies are very powerful," 
 	INTRO_TEXT5 = "so you'll have to be very strong to get them all to get out of Emiphia." 
 	INTRO_TEXT6 = "Do it as fast as you can to gain more poins. GOOD LUCK!"
@@ -321,29 +321,10 @@ class Game:
 		"""
 		Method, that draws health of a player on the screen
 		""" 
-		font = pygame.font.Font('freesansbold.ttf', 20)
-		font2 = pygame.font.Font('freesansbold.ttf', 30)
-		health = font2.render(f'Health: {round(self.player.hp, 0)}', True, [255, 255, 255],None) 
-		points = font.render(f'Points: {round(self.player.points, 0)}', True, [255, 255, 255],None) 
-		highscore = font.render(f'Highscore: {round(self.highscore, 0)}', True, [255, 255, 255],None) 
-		hlp = font.render('Press h for help', True, [255, 255, 255],None) 
-
-		textRect = health.get_rect() 
-		pointsRect = points.get_rect() 
-		highscoreRect = highscore.get_rect() 
-		hlpRect = hlp.get_rect() 
-
-		# set coordinates
-		textRect.center = (450, 30) 
-		pointsRect.center = (70, 40) 
-		highscoreRect.center = (100, 70) 
-		hlpRect.center = (810, 120)
-
-		# draw on screen
-		Game.WIN.blit(health, textRect)
-		Game.WIN.blit(points, pointsRect)  
-		Game.WIN.blit(highscore, highscoreRect) 
-		Game.WIN.blit(hlp, hlpRect) 
+		self.draw_text(Game.WIN, f'Health: {round(self.player.hp, 0)}', [255, 255, 255], 450, 30, 30)
+		self.draw_text(Game.WIN, f'Points: {round(self.player.points, 0)}', [255, 255, 255], 90, 40, 20)
+		self.draw_text(Game.WIN, f'Highscore: {round(self.highscore, 0)}', [255, 255, 255], 100, 70, 20)
+		self.draw_text(Game.WIN, 'Press h for help', [255, 255, 255], 810, 120, 20)
 
 
 	def draw_text(self, surface, text, color, x, y, font_size): 
@@ -588,7 +569,7 @@ class Game:
 				bandit.move_towards_player(self.player, Game.WIDTH) 
 			else:
 				# bandits jump if player is on platform
-				if not (bandit.pos.y <= self.player.pos.y + 50): 
+				if not (bandit.pos.y <= self.player.pos.y + 30) and self.player.is_jumping == False: 
 					bandit.jumping()
 
 			# check if bandit is dead
@@ -643,7 +624,6 @@ class Game:
 		""" 
 
 		self.player.vel = vec(0, 0)
-		#self.player.acc = vec(0, 0)
 		self.player.index = 0 
 		self.animation_action = "idle"
 
