@@ -336,7 +336,7 @@ class Game:
 		:param x: x position of the text 
 		:param y: y position of the text
 		""" 
-		font = pygame.font.Font('freesansbold.ttf', font_size)
+		font = pygame.font.SysFont('freesansbold', font_size+10)
 		text_surface = font.render(text, True, color) 
 		text_rect = text_surface.get_rect() 
 		text_rect.center = (x, y) 

@@ -62,7 +62,7 @@ class Button:
             pygame.draw.rect(screen, self.button_col, button_rect)
 
         # add text to button
-        font = pygame.font.Font('freesansbold.ttf', 15)
+        font = pygame.font.SysFont('freesansbold.ttf', 25)
         text_img = font.render(self.text, True, self.text_col)
         text_len = text_img.get_width()
         screen.blit(text_img, (self.x + int(self.width / 2) - int(text_len / 2), self.y + 8)) 
