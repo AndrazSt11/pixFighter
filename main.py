@@ -10,6 +10,7 @@ from Portal import Portal
 from Physics import Physics
 from Health import Health
 from Button import Button
+from Checkbox import Checkbox
 
 from enum import Enum
 from os import path
@@ -115,7 +116,21 @@ class Game:
 		# buttons
 		self.back = Button(780, 20, 'Back') 
 		self.restart = Button(780, 60, 'Restart') 
-		self.end = Button(400, 400, 'End')
+		self.end = Button(400, 400, 'End') 
+
+		# chackbox
+		my_outline_color = (78, 137, 202)
+		my_check_color = (22, 61, 105)
+		my_font_size = 30
+		my_text_offset = (28, 1)
+		my_font = "freesansbold"
+
+		self.box = None
+		self.idnum = 1 
+
+		self.add_checkbox(Game.WIN, 785, 110, caption="Mute",
+            outline_color=my_outline_color, check_color=my_check_color, font_size=my_font_size, font_color=Game.WHITE,
+            text_offset=my_text_offset, font=my_font)
 
 
 	# ------------------- load methods -------------------------------
@@ -225,7 +240,31 @@ class Game:
 		"""
 		with open('{}'.format(Game.HS_FILE), 'w') as f:
 			f.truncate(0) 
-			f.write(str(self.highscore))
+			f.write(str(self.highscore)) 
+
+	#---------------------- checkbox ------------------------------------
+	def add_checkbox(self, surface, x, y, color=(230, 230, 230), caption="", outline_color=(0, 0, 0), check_color=(0, 0, 0), font_size=22, font_color=(0, 0, 0), text_offset=(28, 1), font='freesansbold'):
+		"""
+		Method for adding checkboxes
+		:param surface: game window, 
+        :param x: x coordinate of checkbox, 
+        :param y: y coordinate of chekbox, 
+        :param idnum: id of checkbox, 
+        :param color: color of checkbox, 
+        :param caption: caption of checkbox, 
+        :param outline_color: outline color of checkbox, 
+        :param check_color: color of a checkbox when it's checked, 
+        :param font_size: size of a caption, 
+        :param font_color: color of a caption, 
+        :param text_offset: distance between checkbox and caption, 
+        :param font: font used in caption
+		"""
+		self.idnum+=1
+
+		box = Checkbox(surface, x, y, self.idnum, color, caption,
+            outline_color, check_color, font_size, font_color, text_offset, font)
+
+		self.box = box 
 
 
 	#-------------------- create bandit method ---------------------------
@@ -293,7 +332,9 @@ class Game:
 
 		# draw buttons
 		self.back.draw_button(Game.WIN) 
-		self.restart.draw_button(Game.WIN)
+		self.restart.draw_button(Game.WIN) 
+
+		self.box.render_checkbox()
 
 
 	def draw_player(self, action, flip, animation_cooldown): 
@@ -324,7 +365,7 @@ class Game:
 		self.draw_text(Game.WIN, f'Health: {round(self.player.hp, 0)}', [255, 255, 255], 450, 30, 30)
 		self.draw_text(Game.WIN, f'Points: {round(self.player.points, 0)}', [255, 255, 255], 90, 40, 20)
 		self.draw_text(Game.WIN, f'Highscore: {round(self.highscore, 0)}', [255, 255, 255], 100, 70, 20)
-		self.draw_text(Game.WIN, 'Press h for help', [255, 255, 255], 810, 120, 20)
+		self.draw_text(Game.WIN, 'Press h for help', [255, 255, 255], 810, 150, 20)
 
 
 	def draw_text(self, surface, text, color, x, y, font_size): 
@@ -523,6 +564,10 @@ class Game:
 				if True not in keys:
 					self.player.index = 0 
 					self.animation_action = "idle" 
+			
+			# check if checkbox is pressed
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				self.box.update_checkbox(event)
 			self.pl_vl = 0
 
 
@@ -687,6 +732,12 @@ class Game:
 
 					# draws background
 					self.draw_background()
+
+					# check if music checkbox is checked/unchecked and mute/unmute
+					if self.box.checked: 
+						self.sounds.pause_music()
+					if not self.box.checked: 
+						self.sounds.unpause_music()
 
 					# draws player
 					self.player.update_movement(Game.WIDTH)
