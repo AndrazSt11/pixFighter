@@ -111,7 +111,10 @@ class Game:
 		self.finish = False 
 
 		# boolean for help
-		self.help = False
+		self.help = False 
+
+		# music paused
+		self.music_paused = False
 
 		# buttons
 		self.back = Button(780, 20, 'Back') 
@@ -734,10 +737,12 @@ class Game:
 					self.draw_background()
 
 					# check if music checkbox is checked/unchecked and mute/unmute
-					if self.box.checked: 
+					if self.box.checked and self.music_paused == False: 
 						self.sounds.pause_music()
-					if not self.box.checked: 
-						self.sounds.unpause_music()
+						self.music_paused = True
+					if not self.box.checked and self.music_paused == True: 
+						self.sounds.unpause_music() 
+						self.music_paused = False
 
 					# draws player
 					self.player.update_movement(Game.WIDTH)
