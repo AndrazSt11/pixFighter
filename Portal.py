@@ -8,7 +8,7 @@ class Portal(pygame.sprite.Sprite):
         :param y: y coordinate of portal sprite 
         """
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((10, 50))
+        self.image = pygame.Surface((10*1.5, 50*1.5))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y

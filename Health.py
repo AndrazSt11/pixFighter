@@ -8,7 +8,7 @@ class Health(pygame.sprite.Sprite):
         :param y: y coordinate of health sprite 
         """
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((30, 15))
+        self.image = pygame.Surface((30*1.5, 15*1.5))
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y

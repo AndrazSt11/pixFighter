@@ -33,10 +33,10 @@ class Bandit:
 		self.hp = hp
 		self.alive = True 
 		self.power = power
-		self.velocity = random.randint(speed[0], speed[1]) # create a bandit with random speed of running
+		self.velocity = random.randint(round(speed[0]*1.5), round(speed[1]*1.5)) # create a bandit with random speed of running
 
 		# bandit jumping
-		self.vle = 12
+		self.vle = 14
 		self.mass = 1
 
 		# animation
@@ -84,7 +84,7 @@ class Bandit:
 		current_list = []
 		for i in range(rg): 
 			img = pygame.image.load(path.format(i))
-			img = pygame.transform.scale(img, (150, 100))
+			img = pygame.transform.scale(img, (150*1.5, 100*1.5))
 			current_list.append(img) 
 
 		return current_list
@@ -110,11 +110,11 @@ class Bandit:
 
 		# check if bandit has reached the player or near player location, to put animation to idle else to run 
 		if self.hurt_time == 5:
-			if player.pos.x - 30 <= self.pos.x <= (player.pos.x + 30) and player.pos.y - 30 <= self.pos.y <= (player.pos.y + 30):
+			if player.pos.x - 30*1.5 <= self.pos.x <= (player.pos.x + 30*1.5) and player.pos.y - 30*1.5 <= self.pos.y <= (player.pos.y + 30*1.5):
 				self.action="attack" 
 				self.animation_cooldown = 100 
 				self.attack_player(player) 
-			elif player.pos.x - 30 <= self.pos.x <= (player.pos.x + 30):
+			elif player.pos.x - 30*1.5 <= self.pos.x <= (player.pos.x + 30*1.5):
 				self.action="idle" 
 				self.animation_cooldown = 100 
 			else: 
@@ -162,7 +162,7 @@ class Bandit:
 		Calculating jump
 		"""
 		# calculate force
-		self.vle = 12
+		self.vle = 14
 		force = (1 / 2)*self.mass*(self.vle**2)
 
 		# change y coordinate
@@ -175,10 +175,10 @@ class Bandit:
 			self.mass =-1
 
 		# if object reaches its original state
-		if self.vle ==-13:
+		if self.vle ==-15:
 			
 			# set the jumping boolean to False 
-			self.vle = 12
+			self.vle = 14
 			self.mass = 1 
 		
 

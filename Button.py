@@ -21,8 +21,8 @@ class Button:
     text_col = white
 
     # dimensions of button
-    width = 100
-    height = 30
+    width = 100*1.5
+    height = 30*1.5
 
     def __init__(self, x, y, text): 
         """
@@ -62,7 +62,7 @@ class Button:
             pygame.draw.rect(screen, self.button_col, button_rect)
 
         # add text to button
-        font = pygame.font.SysFont('freesansbold.ttf', 25)
+        font = pygame.font.SysFont('freesansbold.ttf', round(25*1.5))
         text_img = font.render(self.text, True, self.text_col)
         text_len = text_img.get_width()
         screen.blit(text_img, (self.x + int(self.width / 2) - int(text_len / 2), self.y + 8)) 

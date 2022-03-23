@@ -40,7 +40,7 @@ class Player(pygame.sprite.Sprite):
 
 		# player jumping
 		self.is_jumping = False
-		self.velocity = 12
+		self.velocity = 14
 		self.mass = 1
 
 		# animation 
@@ -72,7 +72,7 @@ class Player(pygame.sprite.Sprite):
 		current_list = []
 		for i in range(rg): 
 			img = pygame.image.load(path.format(i))
-			img = pygame.transform.scale(img, (150, 100))
+			img = pygame.transform.scale(img, (150*1.5, 100*1.5))
 			current_list.append(img) 
 
 		return current_list
@@ -106,7 +106,7 @@ class Player(pygame.sprite.Sprite):
 		Calculate for how much player is going to move
 		:param player_acc: player acceloration
 		"""
-		self.acc = physics.control_position(player_acc, self.acc)
+		self.acc = physics.control_position(player_acc*1.5, self.acc)
 
 
 	def update_movement(self, WIDTH): 
@@ -144,11 +144,11 @@ class Player(pygame.sprite.Sprite):
 			self.mass =-1
 
 		# if object reaches its original state
-		if self.velocity ==-13:
+		if self.velocity ==-15:
 			
 			# set the jumping boolean to False 
 			self.is_jumping = False
-			self.velocity = 12
+			self.velocity = 14
 			self.mass = 1 
 			 
 
