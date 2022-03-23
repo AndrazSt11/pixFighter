@@ -281,7 +281,7 @@ class Game:
 		:param is_light: boolean parameter for types of bandits
 		"""
 		for i in range(num): 
-			self.bandits.append(Bandit(random.randint(100, 800), 180, health, speed, power, is_light)) 
+			self.bandits.append(Bandit(random.randint(100, 800), 420, health, speed, power, is_light)) 
 
 
 	#-------------------- draw methods ------------------------------------
