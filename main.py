@@ -1,4 +1,5 @@
 import time
+import sys
 import pygame
 import random
 import tkinter as tk
@@ -68,7 +69,6 @@ class Game:
 		root = tk.Tk()
 
 		screen_height = root.winfo_screenheight()
-		print(screen_height)
 
 		# change size of window
 		if screen_height <= 1080: 
@@ -417,7 +417,7 @@ class Game:
 					
 					# if we click x the game quits
 					if event.type == pygame.QUIT: 
-						pygame.quit()
+						sys.exit()
 
 				# color the background 
 				Game.WIN.fill((215, 157, 207))
@@ -461,7 +461,7 @@ class Game:
 					
 					# if we click x the game quits
 					if event.type == pygame.QUIT: 
-						pygame.quit()
+						sys.exit()
 
 				# color the background 
 				Game.WIN.fill((43, 178, 70))
@@ -497,8 +497,7 @@ class Game:
 			# if we click x the game quits
 			if event.type == pygame.QUIT: 
 				self.write_hs()
-				pygame.quit()
-
+				sys.exit()
 			if event.type == pygame.KEYDOWN:
 				
 				# move left 
@@ -603,7 +602,7 @@ class Game:
 			# if we click x the game quits
 			if event.type == pygame.QUIT: 
 				self.write_hs()
-				pygame.quit()
+				sys.exit()
 
 			if event.type == pygame.KEYUP:
 				
