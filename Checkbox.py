@@ -2,12 +2,13 @@ import pygame
 pygame.font.init()
 
 class Checkbox:
-    def __init__(self, surface, x, y, idnum, color=(230, 230, 230), caption="", outline_color=(0, 0, 0), check_color=(0, 0, 0), font_size=22, font_color=(0, 0, 0), text_offset=(28, 1), font='freesansbold'):
+    def __init__(self, surface, x, y, res, idnum, color=(230, 230, 230), caption="", outline_color=(0, 0, 0), check_color=(0, 0, 0), font_size=22, font_color=(0, 0, 0), text_offset=(28, 1), font='freesansbold'):
         """
         Checkbox class: 
         :param surface: game window, 
         :param x: x coordinate of checkbox, 
         :param y: y coordinate of chekbox, 
+        :param res: resolution of checkbox,
         :param idnum: id of checkbox, 
         :param color: color of checkbox, 
         :param caption: caption of checkbox, 
@@ -18,14 +19,15 @@ class Checkbox:
         :param text_offset: distance between checkbox and caption, 
         :param font: font used in caption
         """
+        self.res = res
         self.surface = surface
-        self.x = x
-        self.y = y
+        self.x = x * self.res
+        self.y = y * self.res
         self.color = color
         self.caption = caption
         self.oc = outline_color
         self.cc = check_color
-        self.fs = round(font_size * 1.5)
+        self.fs = round(font_size * self.res)
         self.fc = font_color
         self.to = text_offset
         self.ft = font
@@ -34,7 +36,7 @@ class Checkbox:
         self.idnum = idnum
 
         # checkbox object
-        self.checkbox_obj = pygame.Rect(self.x, self.y, 12*1.5, 12*1.5)
+        self.checkbox_obj = pygame.Rect(self.x, self.y, 12*self.res, 12*self.res)
         self.checkbox_outline = self.checkbox_obj.copy()
 
         # variables to test the different states of the checkbox
@@ -58,7 +60,7 @@ class Checkbox:
         if self.checked:
             pygame.draw.rect(self.surface, self.color, self.checkbox_obj)
             pygame.draw.rect(self.surface, self.oc, self.checkbox_outline, 1)
-            pygame.draw.circle(self.surface, self.cc, (self.x + 6*1.5, self.y + 6*1.5), 4*1.5)
+            pygame.draw.circle(self.surface, self.cc, (self.x + 6*self.res, self.y + 6*self.res), 4*self.res)
 
         elif not self.checked:
             pygame.draw.rect(self.surface, self.color, self.checkbox_obj)

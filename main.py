@@ -1,6 +1,7 @@
 import time
 import pygame
 import random
+import tkinter as tk
 
 from Player import Player
 from Bandit import Bandit
@@ -45,7 +46,7 @@ class Game:
 	clock = pygame.time.Clock() 
 
 	# constants for creating main surface (new window of this width and heigth)
-	WIDTH, HEIGTH = 900*1.5, 500*1.5
+	WIDTH, HEIGTH = 900, 500
 	WHITE = (255, 255 ,255) 
 	FPS = 60 
 
@@ -60,11 +61,28 @@ class Game:
 	INTRO_TEXT5 = "so you'll have to be very strong to get them all to get out of Emiphia." 
 	INTRO_TEXT6 = "Do it as fast as you can to gain more poins. GOOD LUCK!"
 
-	# game window
-	WIN = pygame.display.set_mode((WIDTH, HEIGTH))
-	pygame.display.set_caption("pixFighter")
 
 	def __init__(self): 
+
+		# resolution 
+		root = tk.Tk()
+
+		screen_height = root.winfo_screenheight()
+		print(screen_height)
+
+		# change size of window
+		if screen_height <= 1080: 
+			self.res = 1 
+		else: 
+			self.res = 1.8 
+
+		# fit to resolution
+		Game.WIDTH *= self.res
+		Game.HEIGTH *= self.res
+
+		# game window
+		Game.WIN = pygame.display.set_mode((Game.WIDTH, Game.HEIGTH))
+		pygame.display.set_caption("pixFighter")
 
 		# default state
 		self.state = State.TITLE 
@@ -79,7 +97,7 @@ class Game:
 		self.highscore = 0
 
 		# declare player
-		self.player = Player(70, 100, "Player", 100)
+		self.player = Player(70, 100, self.res, "Player", 100)
 		self.pl_vl = 0
 
 		# list of bandits 
@@ -88,7 +106,7 @@ class Game:
 		# sprite groups
 		self.platforms = pygame.sprite.Group() 
 		self.healths = pygame.sprite.Group() 
-		self.portals = pygame.sprite.Group()
+		self.portals = pygame.sprite.Group()  
 
 		# declare sounds object 
 		self.sounds = Sounds() 
@@ -114,12 +132,12 @@ class Game:
 		self.help = False 
 
 		# music paused
-		self.music_paused = False
+		self.music_paused = False 
 
 		# buttons
-		self.back = Button(780*1.5, 20*1.5, 'Back') 
-		self.restart = Button(780*1.5, 60*1.5, 'Restart') 
-		self.end = Button(400*1.5, 400*1.5, 'End') 
+		self.back = Button(780*self.res, 20*self.res, self.res, 'Back') 
+		self.restart = Button(780*self.res, 60*self.res, self.res, 'Restart') 
+		self.end = Button(400*self.res, 400*self.res, self.res, 'End') 
 
 		# chackbox
 		my_outline_color = (78, 137, 202)
@@ -131,7 +149,7 @@ class Game:
 		self.box = None
 		self.idnum = 1 
 
-		self.add_checkbox(Game.WIN, 785*1.5, 110*1.5, caption="Mute",
+		self.add_checkbox(Game.WIN, 785, 110, caption="Mute",
             outline_color=my_outline_color, check_color=my_check_color, font_size=my_font_size, font_color=Game.WHITE,
             text_offset=my_text_offset, font=my_font)
 
@@ -143,11 +161,11 @@ class Game:
 		"""
 		# background
 		self.data['ground_heigth'] = [0, 0]
-		self.data['hill_position'] = [0, 100*1.5]
-		self.data['floor_position'] = [0, 350*1.5]
+		self.data['hill_position'] = [0, 100*self.res]
+		self.data['floor_position'] = [0, 350*self.res]
 
 		# player 
-		self.data['player_position'] = [0, 360*1.5]
+		self.data['player_position'] = [0, 360*self.res]
 
 
 	def load(self):
@@ -157,69 +175,69 @@ class Game:
 
 		# start background 
 		self.assets["start"] = pygame.image.load("./textures/Background/Start.jpg").convert()
-		self.assets["start"] = pygame.transform.scale(self.assets["start"], (900*1.5, 500*1.5))
+		self.assets["start"] = pygame.transform.scale(self.assets["start"], (900*self.res, 500*self.res))
 
 
 		# background lvl 1-3
 		self.assets["lvl1_back"] = pygame.image.load("./textures/Background/bg0.png").convert()
-		self.assets["lvl1_back"] = pygame.transform.scale(self.assets["lvl1_back"], (900*1.5, 500*1.5))
+		self.assets["lvl1_back"] = pygame.transform.scale(self.assets["lvl1_back"], (900*self.res, 500*self.res))
 
 
 		self.assets["lvl1_mountain"] = pygame.image.load("./textures/Background/bg2.png")
-		self.assets["lvl1_mountain"] = pygame.transform.scale(self.assets["lvl1_mountain"], (900*1.5, 500*1.5))
+		self.assets["lvl1_mountain"] = pygame.transform.scale(self.assets["lvl1_mountain"], (900*self.res, 500*self.res))
 
 
 		self.assets["lvl1_hill"] = pygame.image.load("./textures/Background/bg3.png")
-		self.assets["lvl1_hill"] = pygame.transform.scale(self.assets["lvl1_hill"], (900*1.5, 400*1.5))
+		self.assets["lvl1_hill"] = pygame.transform.scale(self.assets["lvl1_hill"], (900*self.res, 400*self.res))
 
 
 		self.assets["lvl1_floor"] = pygame.image.load("./textures/Background/bg4.png")
-		self.assets["lvl1_floor"] = pygame.transform.scale(self.assets["lvl1_floor"], (900*1.5, 150*1.5)) 
+		self.assets["lvl1_floor"] = pygame.transform.scale(self.assets["lvl1_floor"], (900*self.res, 150*self.res)) 
 
 		self.assets["lvl1_floorPL"] = pygame.image.load("./textures/Background/bg4.png")
-		self.assets["lvl1_floorPL"] = pygame.transform.scale(self.assets["lvl1_floorPL"], (150*1.5, 150*1.5)) 
+		self.assets["lvl1_floorPL"] = pygame.transform.scale(self.assets["lvl1_floorPL"], (150*self.res, 150*self.res)) 
 
 
 		# background lvl 4-7
 		self.assets["lvl2_back"] = pygame.image.load("./textures/Background2/sky.png").convert()
-		self.assets["lvl2_back"] = pygame.transform.scale(self.assets["lvl2_back"], (900*1.5, 500*1.5))
+		self.assets["lvl2_back"] = pygame.transform.scale(self.assets["lvl2_back"], (900*self.res, 500*self.res))
 
 
 		self.assets["lvl2_mountain"] = pygame.image.load("./textures/Background2/glacial_mountains.png")
-		self.assets["lvl2_mountain"] = pygame.transform.scale(self.assets["lvl2_mountain"], (900*1.5, 500*1.5))
+		self.assets["lvl2_mountain"] = pygame.transform.scale(self.assets["lvl2_mountain"], (900*self.res, 500*self.res))
 
 
 		self.assets["lvl2_hill"] = pygame.image.load("./textures/Background2/cloud_lonely.png")
-		self.assets["lvl2_hill"] = pygame.transform.scale(self.assets["lvl2_hill"], (900*1.5, 400*1.5))
+		self.assets["lvl2_hill"] = pygame.transform.scale(self.assets["lvl2_hill"], (900*self.res, 400*self.res))
 
 
 		self.assets["lvl2_floor"] = pygame.image.load("./textures/Background2/clouds_mg_3.png")
-		self.assets["lvl2_floor"] = pygame.transform.scale(self.assets["lvl2_floor"], (900*1.5, 150*1.5)) 
+		self.assets["lvl2_floor"] = pygame.transform.scale(self.assets["lvl2_floor"], (900*self.res, 150*self.res)) 
 
 
 		self.assets["lvl2_floorPL"] = pygame.image.load("./textures/Background2/clouds_mg_3.png")
-		self.assets["lvl2_floorPL"] = pygame.transform.scale(self.assets["lvl2_floorPL"], (150*1.5, 150*1.5)) 
+		self.assets["lvl2_floorPL"] = pygame.transform.scale(self.assets["lvl2_floorPL"], (150*self.res, 150*self.res)) 
 
 
 		# background lvl 8-10
 		self.assets["lvl3_back"] = pygame.image.load("./textures/Background3/back.png").convert()
-		self.assets["lvl3_back"] = pygame.transform.scale(self.assets["lvl3_back"], (900*1.5, 500*1.5))
+		self.assets["lvl3_back"] = pygame.transform.scale(self.assets["lvl3_back"], (900*self.res, 500*self.res))
 
 
 		self.assets["lvl3_floor"] = pygame.image.load("./textures/Background3/floor.png")
-		self.assets["lvl3_floor"] = pygame.transform.scale(self.assets["lvl3_floor"], (900*1.5, 450*1.5))  
+		self.assets["lvl3_floor"] = pygame.transform.scale(self.assets["lvl3_floor"], (900*self.res, 450*self.res))  
 
 
 		self.assets["lvl3_floorPL"] = pygame.image.load("./textures/Background3/lvl3_platform.png")
-		self.assets["lvl3_floorPL"] = pygame.transform.scale(self.assets["lvl3_floorPL"], (150*1.5, 50*1.5))
+		self.assets["lvl3_floorPL"] = pygame.transform.scale(self.assets["lvl3_floorPL"], (150*self.res, 50*self.res))
 
 		# load health image 
 		self.assets["health"] = pygame.image.load("./textures/Health/Health.png")
-		self.assets["health"] = pygame.transform.scale(self.assets["health"], (50*1.5, 50*1.5)) 
+		self.assets["health"] = pygame.transform.scale(self.assets["health"], (50*self.res, 50*self.res)) 
 
 		# load portal image 
 		self.assets["portal"] = pygame.image.load("./textures/Portals/portal.png")
-		self.assets["portal"] = pygame.transform.scale(self.assets["portal"], (150*1.5, 150*1.5))
+		self.assets["portal"] = pygame.transform.scale(self.assets["portal"], (150*self.res, 150*self.res))
 
 		# load highscore from file 
 		self.load_hs()
@@ -264,7 +282,7 @@ class Game:
 		"""
 		self.idnum+=1
 
-		box = Checkbox(surface, x, y, self.idnum, color, caption,
+		box = Checkbox(surface, x, y, self.res, self.idnum, color, caption,
             outline_color, check_color, font_size, font_color, text_offset, font)
 
 		self.box = box 
@@ -281,7 +299,7 @@ class Game:
 		:param is_light: boolean parameter for types of bandits
 		"""
 		for i in range(num): 
-			self.bandits.append(Bandit(random.randint(100, 800), 420, health, speed, power, is_light)) 
+			self.bandits.append(Bandit(random.randint(100, 800), 420, health, speed, power, self.res, is_light)) 
 
 
 	#-------------------- draw methods ------------------------------------
@@ -296,42 +314,42 @@ class Game:
 			Game.WIN.blit(self.assets["lvl1_mountain"], self.data['ground_heigth'])
 			Game.WIN.blit(self.assets["lvl1_hill"], self.data['hill_position'])
 			Game.WIN.blit(self.assets["lvl1_floor"], self.data['floor_position']) 
-			Game.WIN.blit(self.assets["lvl1_floorPL"], [150*1.5, 240*1.5])
-			Game.WIN.blit(self.assets["lvl1_floorPL"], [450*1.5, 190*1.5]) 
+			Game.WIN.blit(self.assets["lvl1_floorPL"], [150*self.res, 240*self.res])
+			Game.WIN.blit(self.assets["lvl1_floorPL"], [450*self.res, 190*self.res]) 
 
 			# create portal
 			if self.current_level == 3 and len(self.bandits) == 0:
-				Game.WIN.blit(self.assets["portal"], [450*1.5, 170*1.5])
+				Game.WIN.blit(self.assets["portal"], [450*self.res, 170*self.res])
 
 		elif self.current_level > 3 and self.current_level <= 7:
 			Game.WIN.blit(self.assets["lvl2_back"], [0, 0])
 			Game.WIN.blit(self.assets["lvl2_mountain"], self.data['ground_heigth'])
 			Game.WIN.blit(self.assets["lvl2_hill"], self.data['hill_position'])
 			Game.WIN.blit(self.assets["lvl2_floor"], self.data['floor_position']) 
-			Game.WIN.blit(self.assets["lvl2_floorPL"], [100*1.5, 195*1.5])
-			Game.WIN.blit(self.assets["lvl2_floorPL"], [590*1.5, 215*1.5]) 
+			Game.WIN.blit(self.assets["lvl2_floorPL"], [100*self.res, 195*self.res])
+			Game.WIN.blit(self.assets["lvl2_floorPL"], [590*self.res, 215*self.res]) 
 
 			# add sprite for health
 			if self.current_level == 5 and len(self.healths) != 0: 
-				Game.WIN.blit(self.assets["health"], [620*1.5, 275*1.5]) 
+				Game.WIN.blit(self.assets["health"], [620*self.res, 275*self.res]) 
 
 			# create portal
 			if self.current_level == 7 and len(self.bandits) == 0:
-				Game.WIN.blit(self.assets["portal"], [590*1.5, 200*1.5])
+				Game.WIN.blit(self.assets["portal"], [590*self.res, 200*self.res])
 
 		else: 
 			Game.WIN.blit(self.assets["lvl3_back"], [0, 0])
-			Game.WIN.blit(self.assets["lvl3_floor"], [0, 80*1.5]) 
-			Game.WIN.blit(self.assets["lvl3_floorPL"], [590*1.5, 315*1.5])
-			Game.WIN.blit(self.assets["lvl3_floorPL"], [200*1.5, 275*1.5]) 
+			Game.WIN.blit(self.assets["lvl3_floor"], [0, 80*self.res]) 
+			Game.WIN.blit(self.assets["lvl3_floorPL"], [590*self.res, 315*self.res])
+			Game.WIN.blit(self.assets["lvl3_floorPL"], [200*self.res, 275*self.res]) 
 
 			# add sprite for health
 			if self.current_level == 8 and len(self.healths) != 0: 
-				Game.WIN.blit(self.assets["health"], [230*1.5, 240*1.5]) 
+				Game.WIN.blit(self.assets["health"], [230*self.res, 240*self.res]) 
 
 			# create portal
 			if self.current_level == 10 and len(self.healths) != 0: 
-				Game.WIN.blit(self.assets["health"], [620*1.5, 280*1.5]) 
+				Game.WIN.blit(self.assets["health"], [620*self.res, 280*self.res]) 
 
 		# draw buttons
 		self.back.draw_button(Game.WIN) 
@@ -365,10 +383,10 @@ class Game:
 		"""
 		Method, that draws health of a player on the screen
 		""" 
-		self.draw_text(Game.WIN, f'Health: {round(self.player.hp, 0)}', [255, 255, 255], 450*1.5, 30*1.5, round(30*1.5))
-		self.draw_text(Game.WIN, f'Points: {round(self.player.points, 0)}', [255, 255, 255], 90*1.5, 40*1.5, round(20*1.5))
-		self.draw_text(Game.WIN, f'Highscore: {round(self.highscore, 0)}', [255, 255, 255], 100*1.5, 70*1.5, round(20*1.5))
-		self.draw_text(Game.WIN, 'Press h for help', [255, 255, 255], 810*1.5, 150*1.5, round(20*1.5))
+		self.draw_text(Game.WIN, f'Health: {round(self.player.hp, 0)}', [255, 255, 255], 450*self.res, 30*self.res, round(30*self.res))
+		self.draw_text(Game.WIN, f'Points: {round(self.player.points, 0)}', [255, 255, 255], 90*self.res, 40*self.res, round(20*self.res))
+		self.draw_text(Game.WIN, f'Highscore: {round(self.highscore, 0)}', [255, 255, 255], 100*self.res, 70*self.res, round(20*self.res))
+		self.draw_text(Game.WIN, 'Press h for help', [255, 255, 255], 810*self.res, 150*self.res, round(20*self.res))
 
 
 	def draw_text(self, surface, text, color, x, y, font_size): 
@@ -405,8 +423,8 @@ class Game:
 				Game.WIN.fill((215, 157, 207))
 
 				# set text for main screen
-				self.draw_text(Game.WIN, "GAME OVER", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/3, round(80*1.5)) 
-				self.draw_text(Game.WIN, "Points: {}".format(self.player.points), [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/3) + 80*1.5, round(30*1.5)) 
+				self.draw_text(Game.WIN, "GAME OVER", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/3, round(80*self.res)) 
+				self.draw_text(Game.WIN, "Points: {}".format(self.player.points), [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/3) + 80*self.res, round(30*self.res)) 
 
 				# set the button on the screen
 				self.end.draw_button(Game.WIN) 
@@ -427,7 +445,7 @@ class Game:
 
 				# platforms
 				self.platforms.empty()
-				self.platforms.add(Platform(0, 380*1.5, Game.WIDTH, 40*1.5))
+				self.platforms.add(Platform(0, 380*self.res, Game.WIDTH, 40*self.res))
 				self.state = State.TITLE 
 
 
@@ -449,9 +467,9 @@ class Game:
 				Game.WIN.fill((43, 178, 70))
 
 				# set text for main screen
-				self.draw_text(Game.WIN, "WINNER!", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/3, round(80*1.5)) 
-				self.draw_text(Game.WIN, "Points: {}".format(self.player.points), [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/3) + 80*1.5, round(30*1.5)) 
-				self.draw_text(Game.WIN, "TIME BONUS: {}".format(round(extra)), [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/3) + 160*1.5, round(40*1.5)) 
+				self.draw_text(Game.WIN, "WINNER!", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/3, round(80*self.res)) 
+				self.draw_text(Game.WIN, "Points: {}".format(self.player.points), [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/3) + 80*self.res, round(30*self.res)) 
+				self.draw_text(Game.WIN, "TIME BONUS: {}".format(round(extra)), [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/3) + 160*self.res, round(40*self.res)) 
 
 				# set the button on the screen
 				self.end.draw_button(Game.WIN) 
@@ -489,7 +507,7 @@ class Game:
 
 					# needed for event handling
 					if self.pl_vl == 0:
-						self.pl_vl = -8*1.5
+						self.pl_vl = -8*self.res
 					
 					self.player.control_position(self.pl_vl)
 					self.player.vl = -0.12
@@ -503,7 +521,7 @@ class Game:
 
 					# needed for event handling
 					if self.pl_vl == 0: 
-						self.pl_vl = 8*1.5
+						self.pl_vl = 8*self.res
 					
 					self.player.control_position(self.pl_vl)
 					self.player.vl = -0.12
@@ -536,20 +554,20 @@ class Game:
 				# on key ups stop player movement 
 				if event.key == pygame.K_LEFT or event.key == ord('a'):
 					# needed for event handling
-					if self.pl_vl == -8*1.5:
-						self.pl_vl = -8*1.5
+					if self.pl_vl == -8*self.res:
+						self.pl_vl = -8*self.res
 					else:
-						self.pl_vl = 8*1.5
+						self.pl_vl = 8*self.res
 
 					self.player.control_position(self.pl_vl)
 					self.player.vl = 0
 
 				elif event.key == pygame.K_RIGHT or event.key == ord('d'): 
 					# needed for event handling
-					if self.pl_vl == 8*1.5:
-						self.pl_vl = 8*1.5
+					if self.pl_vl == 8*self.res:
+						self.pl_vl = 8*self.res
 					else:
-						self.pl_vl = -8*1.5
+						self.pl_vl = -8*self.res
 						
 					self.player.control_position(self.pl_vl)
 					self.player.vl = 0
@@ -605,7 +623,7 @@ class Game:
 		Method for updating bandits
 		"""
 		for bandit in self.bandits: 
-			if not (bandit.pos.x <= (self.player.pos.x + 30*1.5) and bandit.pos.x >= self.player.pos.x - 30+1.5):
+			if not (bandit.pos.x <= (self.player.pos.x + 30*self.res) and bandit.pos.x >= self.player.pos.x - 30*self.res):
 				dx, dy = self.player.pos.x - bandit.pos.x, self.player.pos.y - bandit.pos.y
 				# check for direction of player
 				if dx > 0:
@@ -617,7 +635,7 @@ class Game:
 				bandit.move_towards_player(self.player, Game.WIDTH) 
 			else:
 				# bandits jump if player is on platform
-				if not (bandit.pos.y <= self.player.pos.y + 30*1.5) and self.player.is_jumping == False: 
+				if not (bandit.pos.y <= self.player.pos.y + 30*self.res) and self.player.is_jumping == False: 
 					bandit.jumping()
 
 			# check if bandit is dead
@@ -695,7 +713,7 @@ class Game:
 						self.bandits = []
 
 						self.platforms.empty()
-						self.platforms.add(Platform(0, 380*1.5, Game.WIDTH, 40*1.5))
+						self.platforms.add(Platform(0, 380*self.res, Game.WIDTH, 40*self.res))
 
 						self.state = State.LVL1 
 						self.current_level = 0 
@@ -759,9 +777,9 @@ class Game:
 
 					# draw help
 					if self.help:
-						self.draw_text(Game.WIN, "Help:", [255, 255, 255], 850*1.5, 370*1.5, round(23*1.5))
-						self.draw_text(Game.WIN, "Movement: arrows", [255, 255, 255], 793*1.5, 410*1.5, round(20*1.5))
-						self.draw_text(Game.WIN, "Attack: k", [255, 255, 255], 840*1.5, 440*1.5, round(20*1.5))
+						self.draw_text(Game.WIN, "Help:", [255, 255, 255], 850*self.res, 370*self.res, round(23*self.res))
+						self.draw_text(Game.WIN, "Movement: arrows", [255, 255, 255], 793*self.res, 410*self.res, round(20*self.res))
+						self.draw_text(Game.WIN, "Attack: k", [255, 255, 255], 840*self.res, 440*self.res, round(20*self.res))
 
 					# updates display
 					pygame.display.update() 
@@ -774,7 +792,7 @@ class Game:
 					self.player.pos = vec(70, 100)
 
 					self.platforms.empty()
-					self.platforms.add(Platform(0, 380*1.5, Game.WIDTH, 40*1.5))
+					self.platforms.add(Platform(0, 380*self.res, Game.WIDTH, 40*self.res))
 			
 			else: 
 				self.isplaying = False
@@ -798,18 +816,18 @@ class Game:
 			Game.WIN.blit(self.assets["start"], [0, 0])
 
 			# set text for main screen
-			self.draw_text(Game.WIN, "pixFighter", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7, round(80*1.5))
+			self.draw_text(Game.WIN, "pixFighter", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7, round(80*self.res))
 
-			self.draw_text(Game.WIN, Game.INTRO_TEXT1, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 80*1.5, round(20*1.5)) 
-			self.draw_text(Game.WIN, Game.INTRO_TEXT2, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 120*1.5, round(20*1.5))
-			self.draw_text(Game.WIN, Game.INTRO_TEXT3, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 160*1.5, round(20*1.5)) 
-			self.draw_text(Game.WIN, Game.INTRO_TEXT4, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 200*1.5, round(20*1.5)) 
-			self.draw_text(Game.WIN, Game.INTRO_TEXT5, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 240*1.5, round(20*1.5)) 
-			self.draw_text(Game.WIN, Game.INTRO_TEXT6, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 280*1.5, round(20*1.5)) 
+			self.draw_text(Game.WIN, Game.INTRO_TEXT1, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 80*self.res, round(20*self.res)) 
+			self.draw_text(Game.WIN, Game.INTRO_TEXT2, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 120*self.res, round(20*self.res))
+			self.draw_text(Game.WIN, Game.INTRO_TEXT3, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 160*self.res, round(20*self.res)) 
+			self.draw_text(Game.WIN, Game.INTRO_TEXT4, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 200*self.res, round(20*self.res)) 
+			self.draw_text(Game.WIN, Game.INTRO_TEXT5, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 240*self.res, round(20*self.res)) 
+			self.draw_text(Game.WIN, Game.INTRO_TEXT6, [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 280*self.res, round(20*self.res)) 
 
-			self.draw_text(Game.WIN, "Arrows: move, K: attack", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 340*1.5, round(25*1.5))
+			self.draw_text(Game.WIN, "Arrows: move, K: attack", [255, 255, 255], Game.WIDTH/2, Game.HEIGTH/7 + 340*self.res, round(25*self.res))
 
-			self.draw_text(Game.WIN, "Press enter to start the game", [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/2) + 220*1.5, round(20*1.5))
+			self.draw_text(Game.WIN, "Press enter to start the game", [255, 255, 255], Game.WIDTH/2, (Game.HEIGTH/2) + 220*self.res, round(20*self.res))
 
 			# updates display
 			pygame.display.update()
@@ -824,7 +842,7 @@ class Game:
 		self.load() 
 
 		# create platforms
-		floor = Platform(0, 380*1.5, Game.WIDTH, 40*1.5)
+		floor = Platform(0, 380*self.res, Game.WIDTH, 40*self.res)
 		self.platforms.add(floor)
 
 		pygame.init() 
@@ -845,8 +863,8 @@ class Game:
 			else:
 				if self.state == State.LVL1: 
 					# create platforms for this level
-					platform2 = Platform(150*1.5, 250*1.5, 25*1.5, 150*1.5) 
-					platform3 = Platform(450*1.5, 200*1.5, 25*1.5, 150*1.5) 
+					platform2 = Platform(150*self.res, 250*self.res, 25*self.res, 150*self.res) 
+					platform3 = Platform(450*self.res, 200*self.res, 25*self.res, 150*self.res) 
 
 					# adds platforms to group
 					self.platforms.add(platform2)
@@ -870,7 +888,7 @@ class Game:
 					self.main()
 				elif self.state == State.LVL3: 
 					# create a portal
-					portal1 = Portal(450*1.5, 180*1.5)
+					portal1 = Portal(450*self.res, 180*self.res, self.res)
 					self.portals.add(portal1)
 
 					# create bandits and run level
@@ -884,8 +902,8 @@ class Game:
 					self.platforms.remove(platform3) 
 
 					# create platforms for this level
-					platform4 = Platform(100*1.5, 200*1.5, 25*1.5, 150*1.5) 
-					platform5 = Platform(590*1.5, 220*1.5, 25*1.5, 150*1.5) 
+					platform4 = Platform(100*self.res, 200*self.res, 25*self.res, 150*self.res) 
+					platform5 = Platform(590*self.res, 220*self.res, 25*self.res, 150*self.res) 
 
 					# add platforms to group
 					self.platforms.add(platform4)
@@ -902,7 +920,7 @@ class Game:
 					self.main() 
 				elif self.state == State.LVL5: 
 					# add health 
-					hl1 = Health(620*1.5, 215*1.5)
+					hl1 = Health(620*self.res, 215*self.res, self.res)
 					self.healths.add(hl1)
 
 					# create bandits and run level
@@ -923,7 +941,7 @@ class Game:
 					self.main()
 				elif self.state == State.LVL7: 
 					# create a portal
-					portal2 = Portal(590*1.5, 200*1.5)
+					portal2 = Portal(590*self.res, 200*self.res, self.res)
 					self.portals.add(portal2)
 
 					# create bandits and run level
@@ -934,7 +952,7 @@ class Game:
 					self.main()
 				elif self.state == State.LVL8: 
 					# add health 
-					hl2 = Health(230*1.5, 180*1.5)
+					hl2 = Health(230*self.res, 180*self.res, self.res)
 					self.healths.add(hl2)
 
 					# remove current platforms
@@ -942,8 +960,8 @@ class Game:
 					self.platforms.remove(platform5) 
 
 					# add new platforms
-					platform6 = Platform(200*1.5, 180*1.5, 25*1.5, 150*1.5) 
-					platform7 = Platform(590*1.5, 220*1.5, 25*1.5, 150*1.5)
+					platform6 = Platform(200*self.res, 180*self.res, 25*self.res, 150*self.res) 
+					platform7 = Platform(590*self.res, 220*self.res, 25*self.res, 150*self.res)
 					self.platforms.add(platform6)
 					self.platforms.add(platform7) 
 
@@ -968,7 +986,7 @@ class Game:
 					self.main()
 				elif self.state == State.LVL10: 
 					# add health 
-					hl3 = Health(620*1.5, 220*1.5)
+					hl3 = Health(620*self.res, 220*self.res, self.res)
 					self.healths.add(hl3)
 
 					# create bandits and run level

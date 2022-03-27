@@ -10,11 +10,12 @@ physics = Physics()
 vec = pygame.math.Vector2
 
 class Player(pygame.sprite.Sprite): 
-	def __init__(self, x, y, name, hp): 
+	def __init__(self, x, y, res, name, hp): 
 		"""
 		A class of a player
 		:param x: starting x coordinate of a player
 		:param y: starting y coordinate of a player
+		:param res: resolution of screen
 		:param name: name of a player
 		:param hp: health of a user
 		""" 
@@ -33,6 +34,7 @@ class Player(pygame.sprite.Sprite):
 		self.hp = hp
 		self.alive = True 
 		self.points = 0 
+		self.res = res
 
 		# player extra points for time 
 		self.extra_p = 300
@@ -40,7 +42,11 @@ class Player(pygame.sprite.Sprite):
 
 		# player jumping
 		self.is_jumping = False
-		self.velocity = 14
+
+		if self.res == 1:
+			self.velocity = 12
+		elif self.res > 1: 
+			self.velocity = 14
 		self.mass = 1
 
 		# animation 
@@ -72,7 +78,7 @@ class Player(pygame.sprite.Sprite):
 		current_list = []
 		for i in range(rg): 
 			img = pygame.image.load(path.format(i))
-			img = pygame.transform.scale(img, (150*1.5, 100*1.5))
+			img = pygame.transform.scale(img, (150*self.res, 100*self.res))
 			current_list.append(img) 
 
 		return current_list
@@ -106,7 +112,7 @@ class Player(pygame.sprite.Sprite):
 		Calculate for how much player is going to move
 		:param player_acc: player acceloration
 		"""
-		self.acc = physics.control_position(player_acc*1.5, self.acc)
+		self.acc = physics.control_position(player_acc*self.res, self.acc)
 
 
 	def update_movement(self, WIDTH): 
@@ -114,7 +120,10 @@ class Player(pygame.sprite.Sprite):
 		Move player for calculated distance 
 		:param WIDTH: width of game screen
 		""" 
-		self.acc.y = 2.5
+		if self.res == 1:
+			self.acc.y = 2.5
+		elif self.res > 1: 
+			self.acc.y = 3
 		self.pos = physics.update_movement(self.pos, self.vel, self.acc) 
 		self.acc.y = 0
 
@@ -130,7 +139,12 @@ class Player(pygame.sprite.Sprite):
 	def jumping(self): 
 		"""
 		Calculating jump
-		"""
+		""" 
+		if self.res == 1: 
+			vlc = 13 
+		elif self.res > 1: 
+			vlc = 15
+
 		# calculate force
 		force = (1 / 2)*self.mass*(self.velocity**2) 
 
@@ -144,11 +158,11 @@ class Player(pygame.sprite.Sprite):
 			self.mass =-1
 
 		# if object reaches its original state
-		if self.velocity ==-15:
+		if self.velocity ==-vlc:
 			
 			# set the jumping boolean to False 
 			self.is_jumping = False
-			self.velocity = 14
+			self.velocity = vlc - 1
 			self.mass = 1 
 			 
 

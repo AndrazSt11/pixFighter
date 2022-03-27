@@ -21,20 +21,25 @@ class Button:
     text_col = white
 
     # dimensions of button
-    width = 100*1.5
-    height = 30*1.5
+    width = 100
+    height = 30
 
-    def __init__(self, x, y, text): 
+    def __init__(self, x, y, res, text): 
         """
         BUtton class
         :param x: x coordinate of button
         :param y: y coordinate of button 
+        :param res: resolution of button
         :param text: text of the button
         """
         self.x = x
         self.y = y
+        self.res = res
         self.text = text
-        self.clicked = False
+        self.clicked = False 
+
+        self.width = Button.width * self.res
+        self.height = Button.height * self.res
 
 
     def draw_button(self, screen):
@@ -62,7 +67,7 @@ class Button:
             pygame.draw.rect(screen, self.button_col, button_rect)
 
         # add text to button
-        font = pygame.font.SysFont('freesansbold.ttf', round(25*1.5))
+        font = pygame.font.SysFont('freesansbold.ttf', round(25*self.res))
         text_img = font.render(self.text, True, self.text_col)
         text_len = text_img.get_width()
         screen.blit(text_img, (self.x + int(self.width / 2) - int(text_len / 2), self.y + 8)) 
