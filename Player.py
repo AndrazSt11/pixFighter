@@ -180,7 +180,7 @@ class Player(pygame.sprite.Sprite):
 			dist = math.hypot(dx, dy) 
 
 			# check if bandit and player are 0 distance away
-			if dist >= 0 and dist <= 30: 
+			if dist >= 0 and dist <= 30*self.res: 
 				bandit.hp -= 20
 				bandit.action = "hurt"
 				bandit.index = 0
